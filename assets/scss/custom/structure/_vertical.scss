@@ -439,7 +439,7 @@ body[data-sidebar="dark"] {
               color: $sidebar-dark-menu-item-active-color !important;
               background: #726491;
               border-left: 4px solid white;
-              border-radius: 3px
+              border-radius: 3px;
               i {
                 color: $sidebar-dark-menu-item-active-color !important;
               }
@@ -669,4 +669,60 @@ body[data-sidebar="colored"] {
       }
     }
   }
+}
+
+.viewOnly
+{
+
+  border-right: 1px solid #594585 !important;padding-right: 0px !important;height: 557px
+}
+
+.selva{
+
+  .col-3
+  {
+    width: 0px !important;
+
+  }
+  .viewOnly
+  {
+    width: 10px !important;
+    // border: none !important;
+    transition: all 600ms ease-out !important;
+    z-index: 10000 !important;
+    border-right: 1px solid #594585 !important;
+    border-top-left-radius: 10px !important;
+    overflow-x: hidden !important;
+  }
+  .rightexpand
+  {
+    position: absolute !important;
+    top: 50% !important;
+    left: 13px !important;
+    width:20px !important;
+    height: 20px !important;
+    display: block !important;
+  }
+  .viewonlymode_header{
+    display: none;
+  }
+  .leftexpand
+  {
+    display: none !important;
+  }
+  .col-9
+  {
+    width: 97% !important;
+    margin-left: 10px !important;
+  }
+  .accords
+  {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    display: none !important;
+  }
+  // .expandable_workarea
+  // {
+  //   width: 980px !important;
+  // }
 }
