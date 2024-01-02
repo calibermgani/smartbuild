@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Category;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $fillable = [
         'name',
         'category_shortcode',
@@ -17,8 +18,8 @@ class Category extends Model
     ];
 
     public static $rules = [
-        'CategoryName' => 'required',
-        'Category_shortcode' => 'required',
+        'name' => 'required',
+        'category_shortcode' => 'required',
        
     ];
 }

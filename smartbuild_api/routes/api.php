@@ -6,6 +6,7 @@ use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Unit\UnitController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Size\SizeController;
+use App\Http\Controllers\Material\MaterialController;
 
 
 
@@ -52,11 +53,18 @@ Route::prefix('vendors')->group(function () {
 Route::prefix('sizes')->group(function () {
     Route::get('/', [SizeController::class, 'index']);
     Route::post('/', [SizeController::class, 'store']);
-    Route::get('/{size}', [SizeController::class, 'show']);
-    Route::put('/{size}', [SizeController::class, 'update']);
-    Route::delete('/{size}', [SizeController::class, 'destroy']);
+    Route::get('/{id}', [SizeController::class, 'show']);
+    Route::put('/{id}', [SizeController::class, 'update']);
+    Route::delete('/{id}', [SizeController::class, 'destroy']);
 });
 
+Route::prefix('materials')->group(function () {
+    Route::get('/', [MaterialController::class, 'index']);
+    Route::post('/', [MaterialController::class, 'store']);
+    Route::get('/{id}', [MaterialController::class, 'show']);
+    Route::put('/{id}', [MaterialController::class, 'update']);
+    Route::delete('/{id}', [MaterialController::class, 'destroy']);
+});
 
 
 
