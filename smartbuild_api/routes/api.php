@@ -53,11 +53,10 @@ Route::prefix('vendors')->group(function () {
 });
 
 Route::prefix('sizes')->group(function () {
-   
     Route::get('/index', [SizeController::class, 'index']);
     Route::post('/', [SizeController::class, 'store']);
     Route::get('/{id}', [SizeController::class, 'show']);
-    Route::put('/{id}', [SizeController::class, 'update']);
+    Route::put('/{id}', [SizeController::class, 'update']); 
     Route::delete('/{id}', [SizeController::class, 'destroy']);
 });
 
