@@ -24,9 +24,9 @@ use App\Http\Controllers\Submenu\SubmenuController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+}); */
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index']);
@@ -54,7 +54,7 @@ Route::prefix('vendors')->group(function () {
 
 Route::prefix('sizes')->group(function () {
    
-    Route::get('/', [SizeController::class, 'index']);
+    Route::get('/index', [SizeController::class, 'index']);
     Route::post('/', [SizeController::class, 'store']);
     Route::get('/{id}', [SizeController::class, 'show']);
     Route::put('/{id}', [SizeController::class, 'update']);
