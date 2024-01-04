@@ -52,13 +52,13 @@ Route::prefix('vendors')->group(function () {
     Route::delete('/{id}', [VendorController::class, 'destroy']);
 });
 
-// Route::prefix('sizes')->group(function () {
-//     Route::get('/index', [SizeController::class, 'index']);
-//     Route::post('/', [SizeController::class, 'store']);
-//     Route::get('/{id}', [SizeController::class, 'show']);
-//     Route::put('/{id}', [SizeController::class, 'update']); 
-//     Route::delete('/{id}', [SizeController::class, 'destroy']);
-// });
+Route::prefix('sizes')->group(function () {
+    Route::get('/index', [SizeController::class, 'index']);
+    Route::post('/', [SizeController::class, 'store']);
+    Route::get('/{id}', [SizeController::class, 'show']);
+    Route::put('/{id}', [SizeController::class, 'update']); 
+    Route::delete('/{id}', [SizeController::class, 'destroy']);
+});
 
 Route::prefix('materials')->group(function () {
     Route::get('/', [MaterialController::class, 'index']);
@@ -85,6 +85,4 @@ Route::prefix('submenu')->group(function () {
 });
 
 
-Route::prefix('api')->middleware('api')->group(function () {
-    Route::get('/sizes', 'SizeController@index');
-});
+
