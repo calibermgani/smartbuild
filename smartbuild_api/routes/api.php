@@ -85,4 +85,6 @@ Route::prefix('submenu')->group(function () {
 });
 
 
-Route::get('/api/sizes', 'SizeController@index');
+Route::prefix('api')->middleware('api')->group(function () {
+    Route::get('/sizes', 'SizeController@index');
+});
