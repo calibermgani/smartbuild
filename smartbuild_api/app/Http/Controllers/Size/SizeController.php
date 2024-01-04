@@ -35,6 +35,7 @@ class SizeController extends Controller
     public function store(Request $request)
     {
         try {
+            dd("Test");
             $token = $request->query('token');
 
             if (!$this->user_authentication($token)) {
