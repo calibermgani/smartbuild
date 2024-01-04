@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class Vendor extends Model
 {
     use HasFactory, SoftDeletes;
@@ -20,12 +21,14 @@ class Vendor extends Model
         'Added_by'
     ];
 
-    public static function rules($id = null)
-{
-    return [
-        'Vendor Name' => 'required',
-        'Vendor Email' => ['required', 'email', Rule::unique('vendors')->ignore($id)],
-        'Vendor Contact No' => 'required',
-    ];
-}
+public static $rules = [
+    'VendorName' => 'required',
+    'VendorEmail' => 'required',
+    'VendorContactNo' => 'required',
+    // 'VendorContactNo' => [
+    //     'required',
+    //     'regex:/^[0-9]{11}$|^[0-9]{13}$/',
+    // ],
+   
+];
 }

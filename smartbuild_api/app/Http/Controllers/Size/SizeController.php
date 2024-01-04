@@ -26,7 +26,7 @@ class SizeController extends Controller
             }
 
             $sizes = Size::all();
-            return response()->json(['status' => 'success', 'data' => $sizes], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Sizes retrieved successfully', 'code' => 200,'data' => $sizes], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -42,7 +42,7 @@ class SizeController extends Controller
             }
 
             $size = Size::create($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 201);
+            return response()->json(['status' => 'Success', 'message' => 'Sizes created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -58,7 +58,7 @@ class SizeController extends Controller
             }
 
             $size = Size::findOrFail($id);
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Sizes retrieved successfully', 'code' => 200, 'data' => $size], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
@@ -75,7 +75,7 @@ class SizeController extends Controller
 
             $size = Size::findOrFail($id);
             $size->update($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Sizes updated successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -92,7 +92,7 @@ class SizeController extends Controller
 
             $size = Size::findOrFail($id);
             $size->delete();
-            return response()->json(['status' => 'success', 'message' => 'Size deleted successfully'], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Sizes deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

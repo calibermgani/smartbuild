@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendors', function (Blueprint $table) {
+        Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->string('VendorName');
-            $table->string('VendorEmail')->unique();
-            $table->string('VendorContactNo');
-            $table->text('VendorAddress');
-            $table->enum('Status', ['active', 'inactive'])->default('active');
-            $table->string('ContactPerson');
-            $table->string('Added_by');
+            $table->string('menu_name');
+            $table->text('menu_description')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('added_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendors');
+        Schema::table('menus', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

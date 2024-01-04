@@ -6,6 +6,9 @@ use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Unit\UnitController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Size\SizeController;
+use App\Http\Controllers\Material\MaterialController;
+use App\Http\Controllers\Menu\MenuController;
+use App\Http\Controllers\Submenu\SubmenuController;
 
 
 
@@ -21,9 +24,9 @@ use App\Http\Controllers\Size\SizeController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+}); */
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index']);
@@ -50,13 +53,37 @@ Route::prefix('vendors')->group(function () {
 });
 
 Route::prefix('sizes')->group(function () {
-    Route::get('/', [SizeController::class, 'index']);
+   
+    Route::get('/index', [SizeController::class, 'index']);
     Route::post('/', [SizeController::class, 'store']);
-    Route::get('/{size}', [SizeController::class, 'show']);
-    Route::put('/{size}', [SizeController::class, 'update']);
-    Route::delete('/{size}', [SizeController::class, 'destroy']);
+    Route::get('/{id}', [SizeController::class, 'show']);
+    Route::put('/{id}', [SizeController::class, 'update']);
+    Route::delete('/{id}', [SizeController::class, 'destroy']);
 });
 
+Route::prefix('materials')->group(function () {
+    Route::get('/', [MaterialController::class, 'index']);
+    Route::post('/', [MaterialController::class, 'store']);
+    Route::get('/{id}', [MaterialController::class, 'show']);
+    Route::put('/{id}', [MaterialController::class, 'update']);
+    Route::delete('/{id}', [MaterialController::class, 'destroy']);
+});
+
+Route::prefix('menu')->group(function () {
+    Route::get('/', [MenuController::class, 'index']);
+    Route::post('/', [MenuController::class, 'store']);
+    Route::get('/{id}', [MenuController::class, 'show']);
+    Route::put('/{id}', [MenuController::class, 'update']);
+    Route::delete('/{id}', [MenuController::class, 'destroy']);
+});
+
+Route::prefix('submenu')->group(function () {
+    Route::get('/', [SubmenuController::class, 'index']);
+    Route::post('/', [SubmenuController::class, 'store']);
+    Route::get('/{id}', [SubmenuController::class, 'show']);
+    Route::put('/{id}', [SubmenuController::class, 'update']);
+    Route::delete('/{id}', [SubmenuController::class, 'destroy']);
+});
 
 
 

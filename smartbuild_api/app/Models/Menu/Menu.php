@@ -1,25 +1,19 @@
 <?php
 
-namespace App\Models\Category;
+namespace App\Models\Menu;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+class Menu extends Model
 {
     use HasFactory,SoftDeletes;
+
     protected $fillable = [
-        'name',
-        'category_shortcode',
+        'menu_name',
+        'menu_description',
         'status',
         'added_by',
-       
-    ];
-
-    public static $rules = [
-        'name' => 'required',
-        'category_shortcode' => 'required',
-       
     ];
 }

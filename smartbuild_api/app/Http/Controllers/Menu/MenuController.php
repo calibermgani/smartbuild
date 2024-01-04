@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Unit;
+namespace App\Http\Controllers\Menu;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Unit\Unit;
+use App\Models\Menu\Menu;
 
-class UnitController extends Controller
+class MenuController extends Controller
 {
     private $domainToken = '1a32e71a46317b9cc6feb7388238c95d';
 
@@ -24,8 +24,8 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $units = Unit::all();
-            return response()->json(['status' => 'Success', 'message' => 'Units retrieved successfully','code' => 200, 'data' => $units], 200);
+            $Menu = Menu::all();
+            return response()->json(['status' => 'Success', 'message' => 'Menu retrieved successfully', 'code' => 200,'data' => $Menu], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -40,8 +40,8 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::create($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Units created successfully', 'code' => 200]);
+            $Menu = Menu::create($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Menu created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -56,10 +56,10 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $units = Unit::findOrFail($id);
-            return response()->json(['status' => 'Success', 'message' => 'Units retrieved successfully', 'code' => 200 ,'data' => $units]);
+            $Menu = Menu::findOrFail($id);
+            return response()->json(['status' => 'Success', 'message' => 'Menu retrieved successfully', 'code' => 200, 'data' => $Menu], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
     }
 
@@ -72,9 +72,9 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::findOrFail($id);
-            $size->update($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Units updated successfully', 'code' => 200]);
+            $Menu = Menu::findOrFail($id);
+            $Menu->update($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Menu updated successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -89,9 +89,9 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::findOrFail($id);
-            $size->delete();
-            return response()->json(['status' => 'Success', 'message' => 'Units deleted successfully', 'code' => 200]);
+            $Menu = Menu::findOrFail($id);
+            $Menu->delete();
+            return response()->json(['status' => 'Success', 'message' => 'Menu deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

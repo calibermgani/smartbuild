@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('units', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('category_shortcode');
-            $table->boolean('status')->default(1);
-            $table->softDeletes();
-            $table->unsignedBigInteger('added_by')->nullable();
+            $table->string('UnitName');
+            $table->string('unit_short_code');
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('Added_by');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('units', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

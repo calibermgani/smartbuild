@@ -24,8 +24,8 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $sizes = Category::all();
-            return response()->json(['status' => 'success', 'data' => $sizes], 200);
+            $materials = Category::all();
+            return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'data' => $materials], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -40,8 +40,8 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $request->validate(Category::$rules);
-            $size = Category::create($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 201);
+            $material = Category::create($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Category created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -56,8 +56,8 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Category::findOrFail($id);
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            $material = Category::findOrFail($id);
+            return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code' => 200 , 'data' => $material]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
@@ -74,7 +74,7 @@ class CategoryController extends Controller
 
             $size = Category::findOrFail($id);
             $size->update($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Category updated successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -91,7 +91,7 @@ class CategoryController extends Controller
 
             $size = Category::findOrFail($id);
             $size->delete();
-            return response()->json(['status' => 'success', 'message' => 'Category deleted successfully'], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

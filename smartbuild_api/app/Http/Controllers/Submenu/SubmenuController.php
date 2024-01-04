@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Unit;
+namespace App\Http\Controllers\Submenu;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Unit\Unit;
+use App\Models\Submenu\Submenu;
 
-class UnitController extends Controller
+class SubmenuController extends Controller
 {
     private $domainToken = '1a32e71a46317b9cc6feb7388238c95d';
 
@@ -24,8 +24,11 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $units = Unit::all();
-            return response()->json(['status' => 'Success', 'message' => 'Units retrieved successfully','code' => 200, 'data' => $units], 200);
+            $Submenu = Submenu::join('menus', 'submenus.menu_id', '=', 'menus.id')
+                       ->select('submenus.*', 'menus.menu_name', 'menus.menu_description', 'menus.status as menu_status')
+                       ->get();
+                       
+            return response()->json(['status' => 'Success', 'message' => 'Submenu retrieved successfully', 'code' => 200,'data' => $Submenu], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -40,8 +43,8 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::create($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Units created successfully', 'code' => 200]);
+            $Submenu = Submenu::create($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Submenu created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -56,10 +59,13 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $units = Unit::findOrFail($id);
-            return response()->json(['status' => 'Success', 'message' => 'Units retrieved successfully', 'code' => 200 ,'data' => $units]);
+            $Submenu = Submenu::join('menus', 'submenus.menu_id', '=', 'menus.id')
+                       ->select('submenus.*', 'menus.menu_name', 'menus.menu_description', 'menus.status as menu_status')
+                       ->findOrFail($id);
+
+            return response()->json(['status' => 'Success', 'message' => 'Submenu retrieved successfully', 'code' => 200, 'data' => $Submenu], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
     }
 
@@ -72,9 +78,9 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::findOrFail($id);
-            $size->update($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Units updated successfully', 'code' => 200]);
+            $Submenu = Submenu::findOrFail($id);
+            $Submenu->update($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Submenu updated successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -89,9 +95,9 @@ class UnitController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Unit::findOrFail($id);
-            $size->delete();
-            return response()->json(['status' => 'Success', 'message' => 'Units deleted successfully', 'code' => 200]);
+            $Submenu = Submenu::findOrFail($id);
+            $Submenu->delete();
+            return response()->json(['status' => 'Success', 'message' => 'Submenu deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

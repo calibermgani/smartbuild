@@ -24,8 +24,8 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $sizes = Vendor::all();
-            return response()->json(['status' => 'success', 'data' => $sizes], 200);
+            $vendors = Vendor::all();
+            return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200, 'data' => $vendors], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -33,16 +33,18 @@ class VendorController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(Vendor::rules());
+      
         try {
             $token = $request->query('token');
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
+            
+            $request->validate(Vendor::$rules);
             $size = Vendor::create($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 201);
+
+            return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -57,8 +59,8 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Vendor::findOrFail($id);
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            $vendors = Vendor::findOrFail($id);
+            return response()->json(['status' => 'Success', 'message' => 'Vendors retrieved successfully', 'code' => 200 , 'data' => $vendors]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
@@ -73,9 +75,9 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Vendor::findOrFail($id);
-            $size->update($request->all());
-            return response()->json(['status' => 'success', 'data' => $size], 200);
+            $vendors = Vendor::findOrFail($id);
+            $vendors->update($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -92,7 +94,7 @@ class VendorController extends Controller
 
             $size = Vendor::findOrFail($id);
             $size->delete();
-            return response()->json(['status' => 'success', 'message' => 'Vendor deleted successfully'], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Vendors deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
