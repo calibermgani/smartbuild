@@ -16,6 +16,8 @@ class Submenu extends Model
         'submenu_description',
         'status',
         'added_by',
+        'link',
+        'icon'
     ];
 
     // Define the relationship with the Menu model

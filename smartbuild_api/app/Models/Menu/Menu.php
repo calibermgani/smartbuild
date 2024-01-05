@@ -15,5 +15,8 @@ class Menu extends Model
         'menu_description',
         'status',
         'added_by',
+        'link',
+         'icon'
     ];
+
 }
