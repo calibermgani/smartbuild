@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('materials', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('item_no')->nullable();
             $table->string('item_name', 255);
             $table->unsignedBigInteger('items_category'); 
@@ -31,8 +31,9 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->text('images')->nullable();
             $table->string('barcodes')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->softDeletes();
-            $table->string('added_by');
+            $table->Integer('added_by');
             $table->timestamps();
     
             // Foreign key constraints

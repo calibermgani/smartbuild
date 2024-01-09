@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendors', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('VendorName');
             $table->string('VendorEmail')->unique();
             $table->string('VendorContactNo');
             $table->string('VendorAddress')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->string('ContactPerson')->nullable();
-            $table->string('Added_by')->nullable();
+            $table->Integer('Added_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

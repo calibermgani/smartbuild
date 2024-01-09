@@ -24,11 +24,11 @@ class SubmenuController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $Submenu = Submenu::join('menus', 'submenus.menu_id', '=', 'menus.id')
-                       ->select('submenus.*', 'menus.menu_name', 'menus.menu_description', 'menus.status as menu_status')
-                       ->get();
+            $submenus = Submenu::join('menus', 'submenus.menu_id', '=', 'menus.id')
+            ->select('submenus.id as submenu_id', 'submenus.menu_id', 'submenus.submenu_name', 'submenus.submenu_description', 'menus.menu_name')
+            ->get();
                        
-            return response()->json(['status' => 'Success', 'message' => 'Submenu retrieved successfully', 'code' => 200,'data' => $Submenu], 200);
+            return response()->json(['status' => 'Success', 'message' => 'Submenu retrieved successfully', 'code' => 200,'data' => $submenus], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

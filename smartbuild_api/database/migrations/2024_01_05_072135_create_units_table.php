@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
-            $table->id();
-            $table->string('menu_name');
-            $table->text('menu_description')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->string('added_by')->nullable();
-            $table->softDeletes();
+        Schema::create('units', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('UnitName');
+            $table->string('unit_short_code');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->Integer('Added_by');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('menus', function (Blueprint $table) {
+        Schema::table('units', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }
