@@ -18,7 +18,7 @@ class VendorController extends Controller
     public function index(Request $request)
     {
         try {
-            $token = $request->query('token');
+            $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
@@ -33,67 +33,68 @@ class VendorController extends Controller
 
     public function store(Request $request)
     {
-      
+
         try {
-            $token = $request->query('token');
+            $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            
-            $request->validate(Vendor::$rules);
-            $size = Vendor::create($request->all());
 
-            return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200]);
+            $data = $request->validate(Vendor::rules());
+            $vendor = Vendor::create($request->all());
+
+            return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function show(Request $request, $id)
+    public function show(Request $request)
     {
         try {
-            $token = $request->query('token');
+            $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $vendors = Vendor::findOrFail($id);
-            return response()->json(['status' => 'Success', 'message' => 'Vendors retrieved successfully', 'code' => 200 , 'data' => $vendors]);
+            $vendor = Vendor::findOrFail($request->vendor_id);
+            return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200 , 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         try {
-            $token = $request->query('token');
+            $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $vendors = Vendor::findOrFail($id);
-            $vendors->update($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200]);
+            $data = $request->validate(Vendor::rules($request->vendor_id));
+            $vendor = Vendor::findOrFail($request->vendor_id);
+            $vendor->update($request->all());
+            return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request)
     {
         try {
-            $token = $request->query('token');
+            $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $size = Vendor::findOrFail($id);
-            $size->delete();
+            $vendor = Vendor::findOrFail($request->vendor_id);
+            $vendor->delete();
             return response()->json(['status' => 'Success', 'message' => 'Vendors deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);

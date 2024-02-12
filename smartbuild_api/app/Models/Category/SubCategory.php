@@ -7,30 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 
-class Category extends Model
+class SubCategory extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $table = 'categories';
+    protected $table = 'sub_categories';
 
     protected $fillable = [
-        'name',
-        'category_shortcode',
+        'category_id',
+        'sub_category_name',
         'status',
-        'added_by',
-
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     public static function rules($id = null)
     {
         return [
-            'name' => [
+            'sub_category_name' => [
                 'required',
-                Rule::unique('categories', 'name')->whereNull('deleted_at')->ignore($id),
-            ],
-            'category_shortcode' => [
-                'required',
-                Rule::unique('categories', 'category_shortcode')->whereNull('deleted_at')->ignore($id),
+                Rule::unique('sub_categories', 'sub_category_name')->whereNull('deleted_at')->ignore($id),
             ],
         ];
     }
