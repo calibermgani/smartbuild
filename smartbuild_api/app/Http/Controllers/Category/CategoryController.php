@@ -24,7 +24,7 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $categories = Category::with(['sub_categories'])->get();
+            $categories = Category::get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'data' => $categories], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
