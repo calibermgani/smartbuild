@@ -143,9 +143,11 @@ class ItemController extends Controller
                 if (count($item_ids) === count($quantities)) {
                     foreach ($item_ids as $key => $item_id) {
                         $item = Item::find($item_id);
-                        if ($item) {
+                        if (isset($item) && !empty($item)) {
                             $item->store_qty = $quantities[$key];
                             $item->save();
+                        } else{
+                            return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                         }
                     }
                     return response()->json(['status' => 'success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
