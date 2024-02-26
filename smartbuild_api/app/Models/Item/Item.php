@@ -51,7 +51,7 @@ class Item extends Model
                 'required',
                 Rule::unique('items', 'item_name')->whereNull('deleted_at')->ignore($id),
             ],
-            'item_category' => [
+            'item_category_id' => [
                 'required',
             ],
             'item_barcode' => [

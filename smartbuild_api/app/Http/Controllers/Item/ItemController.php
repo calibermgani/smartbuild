@@ -56,7 +56,7 @@ class ItemController extends Controller
             }
             $data = $request->validate(Item::rules());
             $item = Item::create($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $item]);
+            return response()->json(['status' => 'Success', 'message' => 'Item created successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -75,7 +75,7 @@ class ItemController extends Controller
             }
 
             $item = Item::findOrFail($request->item_id);
-            return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code' => 200 , 'data' => $item]);
+            return response()->json(['status' => 'Success', 'message' => 'Item retrieved successfully', 'code' => 200 , 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
@@ -103,7 +103,7 @@ class ItemController extends Controller
             $data = $request->validate(Item::rules($request->item_id));
             $item = Item::findOrFail($request->item_id);
             $item->update($request->all());
-            return response()->json(['status' => 'Success', 'message' => 'Sub Category updated successfully', 'code' => 200, 'data' => $item]);
+            return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
@@ -125,6 +125,36 @@ class ItemController extends Controller
             $item->deletet_by = $request->deleted_by;
             $item->delete();
             return response()->json(['status' => 'Success', 'message' => 'Sub Category deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function itemQuantityUpdate(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->item_id) && !empty($request->item_id)) {
+                $item_ids = explode(',', $request->item_id);
+                $quantities = explode(',', $request->quantity);
+                if (count($item_ids) === count($quantities)) {
+                    foreach ($item_ids as $key => $item_id) {
+                        $item = Item::find($item_id);
+                        if ($item) {
+                            $item->store_qty = $quantities[$key];
+                            $item->save();
+                        }
+                    }
+                    return response()->json(['status' => 'success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
+                } else {
+                    return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }

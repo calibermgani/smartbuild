@@ -12,21 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('items', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('item_number');
             $table->string('item_name');
-            $table->integer('item_category')->nullable();
-            $table->integer('item_sub_category')->nullable();
+            $table->unsignedBigInteger('item_category_id')->nullable();
+            $table->unsignedBigInteger('item_sub_category_id')->nullable();
             $table->string('item_barcode')->nullable();
-            $table->integer('item_procedure')->nullable();
-            $table->integer('item_status')->nullable();
-            $table->integer('vendor')->nullable();
-            $table->float('price')->nullable();
+            $table->unsignedBigInteger('item_procedure_id')->nullable();
+            $table->enum('item_status', ['1', '2'])->default('1')->comment('1-Active 2-Inactive');
+            $table->unsignedBigInteger('vendor_id')->nullable();
+            $table->double('price', 8, 2)->nullable();
             $table->integer('size')->nullable();
-            $table->string('size_type',100)->nullable();
-            $table->string('unit',100)->nullable();
-            $table->integer('cabinet_A_qty')->nullable();
-            $table->integer('cabinet_B_qty')->nullable();
+            $table->string('size_type', 100)->nullable();
+            $table->integer('store_qty')->nullable();
+            $table->integer('cabinet_qty')->nullable();
             $table->date('expired_date')->nullable();
             $table->integer('min_level')->nullable();
             $table->string('cat_no')->nullable();
@@ -34,10 +33,11 @@ return new class extends Migration
             $table->string('item_description')->nullable();
             $table->string('item_notes')->nullable();
             $table->string('tag')->nullable();
-            $table->enum('status',['Active','Inactive'])->default('Active');
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->integer('deleted_by')->nullable();
+            $table->string('image_url')->nullable();
+            $table->integer('unit')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

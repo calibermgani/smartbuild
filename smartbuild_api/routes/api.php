@@ -73,6 +73,7 @@ Route::prefix('items')->group(function () {
     Route::get('/show', [ItemController::class, 'show']);
     Route::put('/update', [ItemController::class, 'update']);
     Route::delete('/destroy', [ItemController::class, 'destroy']);
+    Route::post('/item_quantity_update', [ItemController::class, 'itemQuantityUpdate']);
 });
 
 Route::prefix('sizes')->group(function () {
