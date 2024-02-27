@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category\Category;
+use App\Models\Category\SubCategory;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
@@ -107,12 +108,35 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = Category::select('id', DB::raw("concat(name,' - ',category_shortcode) as categories"))
+            $data = Category::select('id', DB::raw("concat(name,' - ',category_shortcode) as categories"))->where('status', 'Active')
                 ->pluck('categories', 'id')->toArray();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200, 'categories' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code' => 200, 'categories' => $data]);
+            }
+
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function itemSubCategory(Request $request)
+    {
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = SubCategory::where('category_id', $request->item_category_id)->where('status', 'Active')
+                ->pluck('sub_category_name', 'id')->toArray();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code' => 200, 'sub_categories' => $data]);
             }
 
 

@@ -41,6 +41,7 @@ Route::prefix('categories')->group(function () {
     Route::any('/update', [CategoryController::class, 'update']);
     Route::any('/destroy', [CategoryController::class, 'destroy']);
     Route::any('/item_category', [CategoryController::class, 'itemCategory']);
+    Route::any('/item_sub_category', [CategoryController::class, 'itemSubCategory']);
 });
 
 Route::prefix('sub_categories')->group(function () {
