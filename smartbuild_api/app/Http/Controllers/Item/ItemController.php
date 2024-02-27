@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Models\Item\Item;
 
 class ItemController extends Controller
@@ -27,7 +28,7 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $items = Item::all();
+                $items = Item::with(['category', 'sub_category', 'vendors'])->get();
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -158,7 +159,8 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

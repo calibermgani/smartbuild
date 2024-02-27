@@ -3,9 +3,15 @@
 namespace App\Models\Item;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Category\Category;
+use App\Models\Category\SubCategory;
+use App\Models\Vendor\Vendor;
+use App\Models\Tag\Tag;
 
 class Item extends Model
 {
@@ -15,18 +21,17 @@ class Item extends Model
     protected $fillable = [
         'item_number',
         'item_name',
-        'item_category',
-        'item_sub_category',
+        'item_category_id',
+        'item_sub_category_id',
         'item_barcode',
-        'item_procedure',
+        'item_procedure_id',
         'item_status',
-        'vendor',
+        'vendor_id',
         'price',
         'size',
         'size_type',
-        'unit',
-        'cabinet_A_qty',
-        'cabinet_B_qty',
+        'store_qty',
+        'cabinet_qty',
         'expired_date',
         'min_level',
         'cat_no',
@@ -34,7 +39,8 @@ class Item extends Model
         'item_description',
         'item_notes',
         'tag',
-        'status',
+        'image_url',
+        'unit',
         'created_by',
         'updated_by',
         'deleted_by'
@@ -74,5 +80,18 @@ class Item extends Model
                 'required',
             ],
         ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'item_category_id', 'id');
+    }
+    public function sub_category(): BelongsTo
+    {
+        return $this->belongsTo(SubCategory::class, 'item_sub_category_id', 'id');
+    }
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
     }
 }
