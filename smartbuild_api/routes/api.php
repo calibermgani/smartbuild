@@ -62,11 +62,12 @@ Route::prefix('units')->group(function () {
 });
 
 Route::prefix('vendors')->group(function () {
-    Route::get('/', [VendorController::class, 'index']);
-    Route::post('/', [VendorController::class, 'store']);
-    Route::get('/show', [VendorController::class, 'show']);
-    Route::put('/update', [VendorController::class, 'update']);
-    Route::delete('/destroy', [VendorController::class, 'destroy']);
+    Route::any('/index', [VendorController::class, 'index']);
+    Route::any('/store', [VendorController::class, 'store']);
+    Route::any('/show', [VendorController::class, 'show']);
+    Route::any('/update', [VendorController::class, 'update']);
+    Route::any('/destroy', [VendorController::class, 'destroy']);
+    Route::any('/item_vendor', [VendorController::class, 'itemVendor']);
 });
 
 Route::prefix('items')->group(function () {
@@ -87,7 +88,8 @@ Route::prefix('sizes')->group(function () {
 });
 
 Route::prefix('tags')->group(function () {
-    Route::post('/', [TagsController::class, 'store']);
+    Route::any('/store', [TagsController::class, 'store']);
+    Route::any('/item_tags', [TagsController::class, 'itemTags']);
 });
 
 Route::prefix('materials')->group(function () {

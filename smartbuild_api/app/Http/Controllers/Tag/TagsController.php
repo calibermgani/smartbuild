@@ -80,4 +80,26 @@ class TagsController extends Controller
     {
         //
     }
+
+    public function itemTags(Request $request)
+    {
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = Tag::pluck('tag_name', 'id')->toArray();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Tags retrieved successfully', 'code' => 200, 'categories' => $data]);
+            }
+
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
 }
