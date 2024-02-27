@@ -35,11 +35,12 @@ header('Access-Control-Allow-Headers: Accept, Content-Type, X-Auth-Token, Origin
 }); */
 
 Route::prefix('categories')->group(function () {
-    Route::get('/', [CategoryController::class, 'index']);
-    Route::post('/', [CategoryController::class, 'store']);
-    Route::get('/show', [CategoryController::class, 'show']);
-    Route::put('/update', [CategoryController::class, 'update']);
-    Route::delete('/destroy', [CategoryController::class, 'destroy']);
+    Route::any('/index', [CategoryController::class, 'index']);
+    Route::any('/store', [CategoryController::class, 'store']);
+    Route::any('/show', [CategoryController::class, 'show']);
+    Route::any('/update', [CategoryController::class, 'update']);
+    Route::any('/destroy', [CategoryController::class, 'destroy']);
+    Route::any('/item_category', [CategoryController::class, 'itemCategory']);
 });
 
 Route::prefix('sub_categories')->group(function () {
@@ -68,12 +69,12 @@ Route::prefix('vendors')->group(function () {
 });
 
 Route::prefix('items')->group(function () {
-    Route::get('/', [ItemController::class, 'index']);
-    Route::post('/', [ItemController::class, 'store']);
-    Route::get('/show', [ItemController::class, 'show']);
-    Route::put('/update', [ItemController::class, 'update']);
-    Route::delete('/destroy', [ItemController::class, 'destroy']);
-    Route::post('/item_quantity_update', [ItemController::class, 'itemQuantityUpdate']);
+    Route::any('/index', [ItemController::class, 'index']);
+    Route::any('/store', [ItemController::class, 'store']);
+    Route::any('/show', [ItemController::class, 'show']);
+    Route::any('/update', [ItemController::class, 'update']);
+    Route::any('/destroy', [ItemController::class, 'destroy']);
+    Route::any('/item_quantity_update', [ItemController::class, 'itemQuantityUpdate']);
 });
 
 Route::prefix('sizes')->group(function () {
