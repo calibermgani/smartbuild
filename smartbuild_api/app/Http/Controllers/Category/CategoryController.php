@@ -112,7 +112,7 @@ class CategoryController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200, 'categories' => asort($data)]);
+                return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200, 'categories' => $data]);
             }
 
 
