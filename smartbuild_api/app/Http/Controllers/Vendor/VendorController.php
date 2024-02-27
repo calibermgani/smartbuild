@@ -113,7 +113,7 @@ class VendorController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Vendors retrieved successfully', 'code' => 200, 'categories' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Vendors retrieved successfully', 'code' => 200, 'vendors' => $data]);
             }
 
 
