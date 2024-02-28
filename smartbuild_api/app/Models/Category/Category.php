@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Category\SubCategory;
 
 class Category extends Model
 {
@@ -33,5 +35,9 @@ class Category extends Model
                 Rule::unique('categories', 'category_shortcode')->whereNull('deleted_at')->ignore($id),
             ],
         ];
+    }
+    public function sub_category(): HasMany
+    {
+        return $this->hasMany(SubCategory::class, 'category_id', 'id');
     }
 }

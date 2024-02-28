@@ -3,7 +3,6 @@
 namespace App\Models\Item;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
 use App\Models\Vendor\Vendor;
-use App\Models\Tag\Tag;
 
 class Item extends Model
 {

@@ -26,7 +26,7 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $categories = Category::get();
+            $categories = Category::with(['sub_category'])->where('status', 'Active')->get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'data' => $categories], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -58,7 +58,7 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $category = Category::findOrFail($request->category_id);
+            $category = Category::with(['sub_category'])->where('status', 'Active')->findOrFail($request->category_id);
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code' => 200 , 'data' => $category]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
