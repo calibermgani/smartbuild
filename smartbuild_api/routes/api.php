@@ -77,6 +77,7 @@ Route::prefix('items')->group(function () {
     Route::any('/update', [ItemController::class, 'update']);
     Route::any('/destroy', [ItemController::class, 'destroy']);
     Route::any('/item_quantity_update', [ItemController::class, 'itemQuantityUpdate']);
+    Route::any('/item_tags_update', [ItemController::class, 'itemTagsUpdate']);
 });
 
 Route::prefix('sizes')->group(function () {

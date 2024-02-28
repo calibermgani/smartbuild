@@ -17,6 +17,9 @@ class Item extends Model
 
     protected $table = 'items';
     protected $fillable = [
+        'spid',
+        'item_entry_status',
+        'favorite',
         'item_number',
         'item_name',
         'item_category_id',

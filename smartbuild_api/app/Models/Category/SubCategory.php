@@ -5,6 +5,7 @@ namespace App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Validation\Rule;
 
 class SubCategory extends Model
@@ -30,5 +31,9 @@ class SubCategory extends Model
                 Rule::unique('sub_categories', 'sub_category_name')->whereNull('deleted_at')->ignore($id),
             ],
         ];
+    }
+    public function category(): HasOne
+    {
+        return $this->hasOne(Category::class, 'id', 'category_id');
     }
 }
