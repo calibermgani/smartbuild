@@ -90,7 +90,7 @@ class TagsController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = Tag::pluck('tag_name', 'id')->toArray();
+            $data = Tag::get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {

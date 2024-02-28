@@ -109,7 +109,7 @@ class CategoryController extends Controller
             }
 
             $data = Category::select('id', DB::raw("concat(name,' - ',category_shortcode) as categories"))->where('status', 'Active')
-                ->pluck('categories', 'id')->toArray();
+                ->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -132,7 +132,7 @@ class CategoryController extends Controller
             }
 
             $data = SubCategory::where('category_id', $request->item_category_id)->where('status', 'Active')
-                ->pluck('sub_category_name', 'id')->toArray();
+                ->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
