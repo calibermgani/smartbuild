@@ -80,15 +80,15 @@ class Item extends Model
         ];
     }
 
-    public function category(): BelongsTo
+    public function item_category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'item_category_id', 'id');
     }
-    public function sub_category(): BelongsTo
+    public function item_sub_category(): BelongsTo
     {
         return $this->belongsTo(SubCategory::class, 'item_sub_category_id', 'id');
     }
-    public function vendor(): BelongsTo
+    public function item_vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
     }

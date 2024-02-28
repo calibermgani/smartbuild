@@ -45,11 +45,11 @@ Route::prefix('categories')->group(function () {
 });
 
 Route::prefix('sub_categories')->group(function () {
-    Route::get('/', [SubCategoryController::class, 'index']);
-    Route::post('/', [SubCategoryController::class, 'store']);
-    Route::get('/show', [SubCategoryController::class, 'show']);
-    Route::put('/update', [SubCategoryController::class, 'update']);
-    Route::delete('/destroy', [SubCategoryController::class, 'destroy']);
+    Route::any('/index', [SubCategoryController::class, 'index']);
+    Route::any('/store', [SubCategoryController::class, 'store']);
+    Route::any('/show', [SubCategoryController::class, 'show']);
+    Route::any('/update', [SubCategoryController::class, 'update']);
+    Route::any('/destroy', [SubCategoryController::class, 'destroy']);
 });
 
 

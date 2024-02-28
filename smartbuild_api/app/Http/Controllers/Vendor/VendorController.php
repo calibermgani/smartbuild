@@ -24,7 +24,7 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $vendors = Vendor::all();
+            $vendors = Vendor::where('status', 'Active')->get();
             return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200, 'data' => $vendors], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -59,7 +59,7 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $vendor = Vendor::findOrFail($request->vendor_id);
+            $vendor = Vendor::where('status', 'Active')->findOrFail($request->vendor_id);
             return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200 , 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
