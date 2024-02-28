@@ -196,8 +196,11 @@ class ItemController extends Controller
                 foreach ($request->item_id as $key => $item_id) {
                     $item = Item::find($item_id);
                     if (isset($item) && !empty($item)) {
-                        $tags = implode(',', $request->tags);
-                        $item->tag = $tags;
+                        $existingTags = explode(',', $item->tag);
+                        $mergedTags = array_merge($existingTags, $request->tags);
+                        $uniqueTags = array_unique($mergedTags);
+                        $mergedTagString = implode(',', $uniqueTags);
+                        $item->tag = $mergedTagString;
                         $item->save();
                     } else{
                         return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
