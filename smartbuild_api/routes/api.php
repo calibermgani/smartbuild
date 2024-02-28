@@ -12,6 +12,7 @@ use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\Submenu\SubmenuController;
 use App\Http\Controllers\Item\ItemController;
 use App\Http\Controllers\Tag\TagsController;
+use App\Http\Controllers\Procedure\ProcedureController;
 
 header('Access-Control-Allow-Origin:  *');
 header('Access-Control-Allow-Methods:  POST, GET, OPTIONS, PUT, PATCH, DELETE');
@@ -115,6 +116,12 @@ Route::prefix('submenu')->group(function () {
     Route::get('/{id}', [SubmenuController::class, 'show']);
     Route::put('/{id}', [SubmenuController::class, 'update']);
     Route::delete('/{id}', [SubmenuController::class, 'destroy']);
+});
+
+Route::prefix('procedures')->group(function () {
+    Route::any('/index', [ProcedureController::class, 'index']);
+    Route::any('/store', [ProcedureController::class, 'store']);
+    Route::any('/item_procedures', [ProcedureController::class, 'itemProcedures']);
 });
 
 
