@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
 use App\Models\Vendor\Vendor;
@@ -80,16 +80,16 @@ class Item extends Model
         ];
     }
 
-    public function item_category(): BelongsTo
+    public function item_category(): HasOne
     {
-        return $this->belongsTo(Category::class, 'item_category_id', 'id');
+        return $this->hasOne(Category::class, 'id', 'item_category_id');
     }
-    public function item_sub_category(): BelongsTo
+    public function item_sub_category(): HasOne
     {
-        return $this->belongsTo(SubCategory::class, 'item_sub_category_id', 'id');
+        return $this->hasOne(SubCategory::class, 'id', 'item_sub_category_id');
     }
-    public function item_vendor(): BelongsTo
+    public function item_vendor(): HasOne
     {
-        return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
+        return $this->hasOne(Vendor::class, 'id', 'vendor_id');
     }
 }

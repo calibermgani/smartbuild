@@ -28,7 +28,7 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $items = Item::with(['category', 'sub_category', 'vendors'])->get();
+                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor'])->get();
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -56,6 +56,12 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(Item::rules());
+            if (isset($request->tag) && !empty($request->tag)) {
+                $request['tag'] = implode(',', $request->tag);
+            } else {
+                $request['tag'] = [];
+            }
+
             $item = Item::create($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Item created successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
@@ -75,7 +81,7 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $item = Item::findOrFail($request->item_id);
+            $item = Item::with(['item_category', 'item_sub_category', 'item_vendor'])->findOrFail($request->item_id);
             return response()->json(['status' => 'Success', 'message' => 'Item retrieved successfully', 'code' => 200 , 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
