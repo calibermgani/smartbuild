@@ -107,7 +107,7 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure retrieved successfully', 'code' => 200, 'categories' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Procedure retrieved successfully', 'code' => 200, 'procedures' => $data]);
             }
 
 
