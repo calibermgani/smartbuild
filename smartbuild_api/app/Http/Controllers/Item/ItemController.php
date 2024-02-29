@@ -135,6 +135,16 @@ class ItemController extends Controller
             $request['item_entry_status'] = 'update';
             $item = Item::findOrFail($request->item_id);
             $item->update($request->all());
+            if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+                $item_procedure_ids = explode(',', $request->item_procedure_id);
+                ItemProcedure::where('item_id', $item->id)->delete();
+                foreach ($item_procedure_ids as $procedure_id) {
+                    $itemProcedure = new ItemProcedure();
+                    $itemProcedure->item_id = $item->id;
+                    $itemProcedure->procedure_id = $procedure_id;
+                    $itemProcedure->save();
+                }
+            }
             return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
