@@ -28,7 +28,7 @@ class SubCategoryController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $subCategories = SubCategory::with(['category'])->where('status', 'Active')->get();
+                $subCategories = SubCategory::with(['category'])->get();
                 return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code'=>200, 'data' => $subCategories], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -75,7 +75,7 @@ class SubCategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $subCategory = SubCategory::with(['category'])->where('status', 'Active')->findOrFail($request->sub_category_id);
+            $subCategory = SubCategory::with(['category'])->findOrFail($request->sub_category_id);
             return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code' => 200 , 'data' => $subCategory]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);

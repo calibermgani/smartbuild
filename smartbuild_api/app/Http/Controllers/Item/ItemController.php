@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Item\Item;
+use App\Models\Item\ItemProcedure;
 
 class ItemController extends Controller
 {
@@ -29,7 +30,7 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor'])->get();
+                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->get();
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -70,6 +71,17 @@ class ItemController extends Controller
             }
             $request['item_entry_status'] = 'create';
             $item = Item::create($request->all());
+            if ($item) {
+                if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+                    $procedureIds = explode(',', $request->item_procedure_id);
+                    foreach ($procedureIds as $procedure_id) {
+                        $itemProcedure = new ItemProcedure();
+                        $itemProcedure->item_id = $item->id;
+                        $itemProcedure->procedure_id = $procedure_id;
+                        $itemProcedure->save();
+                    }
+                }
+            }
             return response()->json(['status' => 'Success', 'message' => 'Item created successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -88,7 +100,7 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $item = Item::with(['item_category', 'item_sub_category', 'item_vendor'])->findOrFail($request->item_id);
+            $item = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->findOrFail($request->item_id);
             return response()->json(['status' => 'Success', 'message' => 'Item retrieved successfully', 'code' => 200 , 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
