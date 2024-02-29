@@ -14,9 +14,9 @@ use App\Http\Controllers\Item\ItemController;
 use App\Http\Controllers\Tag\TagsController;
 use App\Http\Controllers\Procedure\ProcedureController;
 
-header('Access-Control-Allow-Origin:  *');
-header('Access-Control-Allow-Methods:  POST, GET, OPTIONS, PUT, PATCH, DELETE');
-header('Access-Control-Allow-Headers: Accept, Content-Type, X-Auth-Token, Origin, Authorization');
+// header('Access-Control-Allow-Origin:  *');
+// header('Access-Control-Allow-Methods:  POST, GET, OPTIONS, PUT, PATCH, DELETE');
+// header('Access-Control-Allow-Headers: Accept, Content-Type, X-Auth-Token, Origin, Authorization');
 
 
 
@@ -79,6 +79,7 @@ Route::prefix('items')->group(function () {
     Route::any('/destroy', [ItemController::class, 'destroy']);
     Route::any('/item_quantity_update', [ItemController::class, 'itemQuantityUpdate']);
     Route::any('/item_tags_update', [ItemController::class, 'itemTagsUpdate']);
+    Route::any('/item_clone', [ItemController::class, 'itemClone']);
 });
 
 Route::prefix('sizes')->group(function () {
