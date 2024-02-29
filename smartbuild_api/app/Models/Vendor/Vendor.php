@@ -17,7 +17,7 @@ class Vendor extends Model
         'VendorEmail',
         'VendorContactNo',
         'VendorAddress',
-        'Status',
+        'status',
         'ContactPerson',
         'Added_by'
     ];
