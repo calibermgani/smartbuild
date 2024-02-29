@@ -23,12 +23,15 @@ class SubCategory extends Model
         'deleted_by',
     ];
 
-    public static function rules($id = null)
+    public static function rules($id = null, $categoryId)
     {
         return [
             'sub_category_name' => [
                 'required',
-                Rule::unique('sub_categories', 'sub_category_name')->whereNull('deleted_at')->ignore($id),
+                Rule::unique('sub_categories', 'sub_category_name')
+                    ->whereNull('deleted_at')
+                    ->where('category_id', $categoryId)
+                    ->ignore($id),
             ],
         ];
     }

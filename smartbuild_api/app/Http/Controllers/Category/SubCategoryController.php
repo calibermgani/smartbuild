@@ -55,7 +55,7 @@ class SubCategoryController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(SubCategory::rules());
+            $data = $request->validate(SubCategory::rules(null, $request->category_id));
             $subCategory = SubCategory::create($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
@@ -101,7 +101,7 @@ class SubCategoryController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(SubCategory::rules($request->sub_category_id));
+            $data = $request->validate(SubCategory::rules($request->sub_category_id, $request->category_id));
             $subCategory = SubCategory::findOrFail($request->sub_category_id);
             $subCategory->update($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Sub Category updated successfully', 'code' => 200, 'data' => $subCategory]);
