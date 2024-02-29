@@ -25,8 +25,6 @@ class Category extends Model
 
     public static function rules($id = null)
     {
-
-        dd($id);
         return [
             'name' => [
                 'required',
