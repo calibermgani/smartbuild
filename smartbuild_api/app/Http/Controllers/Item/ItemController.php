@@ -61,7 +61,7 @@ class ItemController extends Controller
             if (isset($request->tag) && !empty($request->tag)) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
-                $request['tag'] = [];
+                $request['tag'] = "";
             }
             $lastItem = Item::orderBy('id', 'desc')->first();
             if (isset($lastItem) && !empty($lastItem)) {
@@ -130,7 +130,7 @@ class ItemController extends Controller
             if (isset($request->tag) && !empty($request->tag)) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
-                $request['tag'] = [];
+                $request['tag'] = "";
             }
             $request['item_entry_status'] = 'update';
             $item = Item::findOrFail($request->item_id);
