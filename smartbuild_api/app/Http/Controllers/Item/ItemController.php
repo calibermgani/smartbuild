@@ -73,7 +73,7 @@ class ItemController extends Controller
             $item = Item::create($request->all());
             if ($item) {
                 if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
-                    $procedureIds = explode(',', $request->item_procedure_id);
+                    $procedureIds = $request->item_procedure_id;
                     foreach ($procedureIds as $procedure_id) {
                         $itemProcedure = new ItemProcedure();
                         $itemProcedure->item_id = $item->id;
@@ -136,7 +136,7 @@ class ItemController extends Controller
             $item = Item::findOrFail($request->item_id);
             $item->update($request->all());
             if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
-                $item_procedure_ids = explode(',', $request->item_procedure_id);
+                $item_procedure_ids = $request->item_procedure_id;
                 ItemProcedure::where('item_id', $item->id)->delete();
                 foreach ($item_procedure_ids as $procedure_id) {
                     $itemProcedure = new ItemProcedure();
@@ -144,6 +144,8 @@ class ItemController extends Controller
                     $itemProcedure->procedure_id = $procedure_id;
                     $itemProcedure->save();
                 }
+            }else{
+                ItemProcedure::where('item_id', $item->id)->delete();
             }
             return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
@@ -254,8 +256,7 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $itemCheck = Item::where('id', $request->item_id)->get();
-
+            $itemCheck = Item::whereIn('id', $request->item_id)->get();
             if (count($itemCheck) > 0) {
                 foreach ($itemCheck as $key => $item) {
                     $lastItem = Item::orderBy('id', 'desc')->first();
@@ -264,40 +265,40 @@ class ItemController extends Controller
                     } else {
                         $item['spid'] = 'SPV'. Carbon::now()->year . 1;
                     }
-                    $itemClone = new Item();
-                    $itemClone->spid = $item['spid'];
-                    $itemClone->item_entry_status = "clone";
-                    $itemClone->favorite = $item['favorite'];
-                    $itemClone->item_number = $item['item_number'];
-                    $itemClone->item_name = $item['item_name'];
-                    $itemClone->item_category_id = $item['item_category_id'];
-                    $itemClone->item_sub_category_id = $item['item_sub_category_id'];
-                    $itemClone->item_barcode = $item['item_barcode'];
-                    $itemClone->item_procedure_id = $item['item_procedure_id'];
-                    $itemClone->item_status = $item['item_status'];
-                    $itemClone->vendor_id = $item['vendor_id'];
-                    $itemClone->price = $item['price'];
-                    $itemClone->size = $item['size'];
-                    $itemClone->size_type = $item['size_type'];
-                    $itemClone->store_qty = $item['store_qty'];
-                    $itemClone->cabinet_qty = $item['cabinet_qty'];
-                    $itemClone->expired_date = $item['expired_date'];
-                    $itemClone->min_level = $item['min_level'];
-                    $itemClone->cat_no = $item['cat_no'];
-                    $itemClone->lot_no = $item['lot_no'];
-                    $itemClone->item_description = $item['item_description'];
-                    $itemClone->item_notes = $item['item_notes'];
-                    $itemClone->tag = $item['tag'];
-                    $itemClone->image_url = $item['image_url'];
-                    $itemClone->unit = $item['unitss    '];
-                    $itemClone->created_by = 1;
-                    $itemClone->save();
-                    if ($itemClone) {
+                    $clone = new Item();
+                    $clone->spid = $item['spid'];
+                    $clone->item_entry_status = "clone";
+                    $clone->favorite = $item['favorite'];
+                    $clone->item_number = $item['item_number'];
+                    $clone->item_name = $item['item_name'];
+                    $clone->item_category_id = $item['item_category_id'];
+                    $clone->item_sub_category_id = $item['item_sub_category_id'];
+                    $clone->item_barcode = $item['item_barcode'];
+                    $clone->item_procedure_id = $item['item_procedure_id'];
+                    $clone->item_status = $item['item_status'];
+                    $clone->vendor_id = $item['vendor_id'];
+                    $clone->price = $item['price'];
+                    $clone->size = $item['size'];
+                    $clone->size_type = $item['size_type'];
+                    $clone->store_qty = $item['store_qty'];
+                    $clone->cabinet_qty = $item['cabinet_qty'];
+                    $clone->expired_date = $item['expired_date'];
+                    $clone->min_level = $item['min_level'];
+                    $clone->cat_no = $item['cat_no'];
+                    $clone->lot_no = $item['lot_no'];
+                    $clone->item_description = $item['item_description'];
+                    $clone->item_notes = $item['item_notes'];
+                    $clone->tag = $item['tag'];
+                    $clone->image_url = $item['image_url'];
+                    $clone->unit = $item['unitss    '];
+                    $clone->created_by = 1;
+                    $clone->save();
+                    if ($clone) {
                         if (isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
                             $procedureIds = explode(',', $item->item_procedure_id);
                             foreach ($procedureIds as $procedure_id) {
                                 $itemProcedure = new ItemProcedure();
-                                $itemProcedure->item_id = $itemClone->id;
+                                $itemProcedure->item_id = $clone->id;
                                 $itemProcedure->procedure_id = $procedure_id;
                                 $itemProcedure->save();
                             }
