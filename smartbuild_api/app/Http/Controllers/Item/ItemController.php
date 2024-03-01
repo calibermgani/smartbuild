@@ -30,7 +30,7 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->get();
+                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures', 'item_clones'])->whereNull('item_clone_id')->get();
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -278,6 +278,7 @@ class ItemController extends Controller
                     }
                     $clone = new Item();
                     $clone->spid = $item['spid'];
+                    $clone->item_clone_id = $item['id'];
                     $clone->item_entry_status = "clone";
                     $clone->favorite = $item['favorite'];
                     $clone->item_number = $item['item_number'];

@@ -4,6 +4,7 @@ namespace App\Models\Item;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class Item extends Model
     protected $table = 'items';
     protected $fillable = [
         'spid',
+        'item_clone_id',
         'item_entry_status',
         'favorite',
         'item_number',
@@ -101,5 +103,9 @@ class Item extends Model
     public function item_procedures(): BelongsToMany
     {
         return $this->belongsToMany(Procedure::class , 'item_procedures', 'item_id', 'procedure_id');
+    }
+    public function item_clones(): HasMany
+    {
+        return $this->hasMany(Item::class, 'item_clone_id')->with(['item_category','item_sub_category','item_vendor','item_procedures']);
     }
 }
