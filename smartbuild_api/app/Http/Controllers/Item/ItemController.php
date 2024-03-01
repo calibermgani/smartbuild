@@ -70,10 +70,15 @@ class ItemController extends Controller
                 $request['spid'] = 'SPV'. Carbon::now()->year . 1;
             }
             $request['item_entry_status'] = 'create';
+            if (count($request->item_procedure_id) > 0) {
+                $request['item_procedure_id'] = implode(',', $request->item_procedure_id);
+            } else {
+                $request['item_procedure_id'] = null;
+            }
             $item = Item::create($request->all());
             if ($item) {
                 if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
-                    $procedureIds = $request->item_procedure_id;
+                    $procedureIds = explode(',', $request->item_procedure_id);
                     foreach ($procedureIds as $procedure_id) {
                         $itemProcedure = new ItemProcedure();
                         $itemProcedure->item_id = $item->id;
@@ -133,10 +138,16 @@ class ItemController extends Controller
                 $request['tag'] = null;
             }
             $request['item_entry_status'] = 'update';
+            if (count($request->item_procedure_id) > 0) {
+                $request['item_procedure_id'] = implode(',', $request->item_procedure_id);
+            } else {
+                $request['item_procedure_id'] = null;
+            }
             $item = Item::findOrFail($request->item_id);
             $item->update($request->all());
+
             if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
-                $item_procedure_ids = $request->item_procedure_id;
+                $item_procedure_ids = explode(',', $request->item_procedure_id);
                 ItemProcedure::where('item_id', $item->id)->delete();
                 foreach ($item_procedure_ids as $procedure_id) {
                     $itemProcedure = new ItemProcedure();
