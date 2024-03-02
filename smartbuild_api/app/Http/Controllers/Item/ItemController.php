@@ -302,7 +302,7 @@ class ItemController extends Controller
                     $clone->item_notes = $item['item_notes'];
                     $clone->tag = $item['tag'];
                     $clone->image_url = $item['image_url'];
-                    $clone->unit = $item['unitss    '];
+                    $clone->unit = $item['unit'];
                     $clone->created_by = 1;
                     $clone->save();
                     if ($clone) {
