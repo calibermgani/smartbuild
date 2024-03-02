@@ -40,7 +40,7 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
+            $request['Added_by'] = "1";
             $data = $request->validate(Vendor::rules());
             $vendor = Vendor::create($request->all());
 
@@ -74,7 +74,7 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
+            $request['Added_by'] = "1";
             $data = $request->validate(Vendor::rules($request->vendor_id));
             $vendor = Vendor::findOrFail($request->vendor_id);
             $vendor->update($request->all());
