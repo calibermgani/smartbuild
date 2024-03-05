@@ -131,7 +131,7 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            // $data = $request->validate(Item::rules($request->item_id));
+            $data = $request->validate(Item::rules($request->item_id));
             if (isset($request->tag) && !empty($request->tag)) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
@@ -323,33 +323,6 @@ class ItemController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Item cloned successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
-        }
-    }
-    public function itemMove(Request $request)
-    {
-        try {
-            $token = $request->token;
-            if (!$this->user_authentication($token)) {
-                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
-            }
-            if (isset($request->item_id) && !empty($request->item_id)) {
-                foreach ($request->item_id as $key => $item_id) {
-                    $item = Item::find($item_id);
-                    if (isset($item) && !empty($item)) {
-                        $item ->item_category_id = $request->item_category_id;
-                        $item ->item_sub_category_id = $request->item_sub_category_id;
-                        $item->save();
-                    } else{
-                        return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
-                    }
-                }
-                return response()->json(['status' => 'success', 'message' => 'Item moved successfully', 'code' => 200]);
-            } else {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
-            }
-        } catch (\Exception $e) {
-            log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }
