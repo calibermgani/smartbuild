@@ -207,7 +207,7 @@ class ItemController extends Controller
                             return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                         }
                     }
-                    return response()->json(['status' => 'success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
+                    return response()->json(['status' => 'Success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
                 } else {
                     return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                 }
@@ -249,7 +249,7 @@ class ItemController extends Controller
                         return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                     }
                 }
-                return response()->json(['status' => 'success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
+                return response()->json(['status' => 'Success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
@@ -343,7 +343,7 @@ class ItemController extends Controller
                         return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                     }
                 }
-                return response()->json(['status' => 'success', 'message' => 'Item moved successfully', 'code' => 200]);
+                return response()->json(['status' => 'Success', 'message' => 'Item moved successfully', 'code' => 200]);
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
