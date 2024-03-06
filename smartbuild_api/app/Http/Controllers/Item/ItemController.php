@@ -30,8 +30,78 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures', 'item_clones'])->whereNull('item_clone_id')->get();
-                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'data' => $items], 200);
+                if (isset($request->cabinet_qty) && !empty($request->cabinet_qty)) {
+                    $min_cabinet_qty = $request->cabinet_qty[0];
+                    $max_cabinet_qty = $request->cabinet_qty[1];
+                } else {
+                    $min_cabinet_qty = "";
+                    $max_cabinet_qty = "";
+                }
+                if (isset($request->price) && !empty($request->price)) {
+                    $min_price = $request->price[0];
+                    $max_price = $request->price[1];
+                } else {
+                    $min_price = "";
+                    $max_price = "";
+                }
+                if (isset($request->min_level) && !empty($request->min_level)) {
+                    $min_min_level = $request->min_level[0];
+                    $max_min_level = $request->min_level[1];
+                } else {
+                    $min_min_level = "";
+                    $max_min_level = "";
+                }
+                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures', 'item_clones'])
+                    ->where(function ($query) use ($request, $min_cabinet_qty, $max_cabinet_qty, $min_price, $max_price, $min_min_level, $max_min_level) {
+                        if (isset($request->item_category_id) && !empty($request->item_category_id)) {
+                            $query->where('item_category_id', $request->item_category_id);
+                        } else {
+                            $query;
+                        }
+                        if (isset($request->item_name) && !empty($request->item_name)) {
+                            $query->where('item_name','like', '%' . $request->item_name . '%');
+                        } else {
+                            $query;
+                        }
+                        if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+                            $query->where('item_procedure_id','like', '%' . $request->item_procedure_id . '%');
+                        } else {
+                            $query;
+                        }
+                        if (!empty($min_cabinet_qty) && !empty($max_cabinet_qty)) {
+                            $query->whereBetween('cabinet_qty', [$min_cabinet_qty, $max_cabinet_qty]);
+                        } else {
+                            $query;
+                        }
+                        if (!empty($min_price) && !empty($max_price)) {
+                            $query->whereBetween('price', [$min_price, $max_price]);
+                        } else {
+                            $query;
+                        }
+                        if (!empty($min_min_level) && !empty($max_min_level)) {
+                            $query->whereBetween('min_level', [$min_min_level, $max_min_level]);
+                        } else {
+                            $query;
+                        }
+                        if (isset($request->tag) && !empty($request->tag)) {
+                            $query->where('tag','like', '%' . $request->tag . '%');
+                        } else {
+                            $query;
+                        }
+                        if (isset($request->item_barcode) && !empty($request->item_barcode)) {
+                            $query->where('item_barcode','like', '%' . $request->item_barcode . '%');
+                        } else {
+                            $query;
+                        }
+                        if (isset($request->item_notes) && !empty($request->item_notes)) {
+                            $query->where('item_notes','like', '%' . $request->item_notes . '%');
+                        } else {
+                            $query;
+                        }
+                    })
+                    ->whereNull('item_clone_id')
+                    ->get();
+                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
             }
