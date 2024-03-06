@@ -26,8 +26,23 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $categories = Category::with(['sub_category'])->get();
-            return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'data' => $categories], 200);
+            $categories = Category::with(['sub_category'])
+                ->whereHas('sub_category' , function ($query) use ($request) {
+                    if (isset($request->category_search) && !empty($request->category_search)) {
+                        $query->where('sub_category_name', 'like', '%' . $request->category_search . '%');
+                    } else {
+                        $query;
+                    }
+                })
+                ->orWhere(function ($query) use ($request) {
+                    if (isset($request->category_search) && !empty($request->category_search)) {
+                        $query->where('name', 'like', '%' . $request->category_search . '%');
+                    } else {
+                        $query;
+                    }
+                })
+                ->get();
+            return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'total_count' => count($categories), 'data' => $categories], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
