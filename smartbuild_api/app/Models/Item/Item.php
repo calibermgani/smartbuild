@@ -56,18 +56,18 @@ class Item extends Model
         return [
             'item_number' => [
                 'required',
-                Rule::unique('items', 'item_number')->whereNull('deleted_at')->ignore($id),
+                Rule::unique('items', 'item_number')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
             ],
             'item_name' => [
                 'required',
-                Rule::unique('items', 'item_name')->whereNull('deleted_at')->ignore($id),
+                Rule::unique('items', 'item_name')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
             ],
             'item_category_id' => [
                 'required',
             ],
             'item_barcode' => [
                 'required',
-                Rule::unique('items', 'item_barcode')->whereNull('deleted_at')->ignore($id),
+                Rule::unique('items', 'item_barcode')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
             ],
             'price' => [
                 'required',
