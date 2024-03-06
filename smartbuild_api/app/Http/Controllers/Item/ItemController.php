@@ -30,6 +30,13 @@ class ItemController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
+                if (isset($request->store_qty) && !empty($request->store_qty)) {
+                    $min_store_qty = $request->store_qty[0];
+                    $max_store_qty = $request->store_qty[1];
+                } else {
+                    $min_store_qty = "";
+                    $max_store_qty = "";
+                }
                 if (isset($request->cabinet_qty) && !empty($request->cabinet_qty)) {
                     $min_cabinet_qty = $request->cabinet_qty[0];
                     $max_cabinet_qty = $request->cabinet_qty[1];
@@ -52,7 +59,7 @@ class ItemController extends Controller
                     $max_min_level = "";
                 }
                 $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures', 'item_clones'])
-                    ->where(function ($query) use ($request, $min_cabinet_qty, $max_cabinet_qty, $min_price, $max_price, $min_min_level, $max_min_level) {
+                    ->where(function ($query) use ($request, $min_cabinet_qty, $max_cabinet_qty, $min_price, $max_price, $min_min_level, $max_min_level, $min_store_qty, $max_store_qty) {
                         if (isset($request->item_category_id) && !empty($request->item_category_id)) {
                             $query->where('item_category_id', $request->item_category_id);
                         } else {
@@ -70,6 +77,11 @@ class ItemController extends Controller
                         }
                         if (!empty($min_cabinet_qty) && !empty($max_cabinet_qty)) {
                             $query->whereBetween('cabinet_qty', [$min_cabinet_qty, $max_cabinet_qty]);
+                        } else {
+                            $query;
+                        }
+                        if (!empty($min_store_qty) && !empty($max_store_qty)) {
+                            $query->whereBetween('cabinet_qty', [$min_store_qty, $max_store_qty]);
                         } else {
                             $query;
                         }
