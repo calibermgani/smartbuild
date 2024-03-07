@@ -434,4 +434,84 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
+
+    public function itemBulkEdit(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->item_id) && !empty($request->item_id)) {
+                foreach ($request->item_id as $key => $item_id) {
+                    $item = Item::find($item_id);
+                    if (isset($item) && !empty($item)) {
+
+                        if (isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                            $existingItemProcedures = explode(',', $item->item_procedure_id);
+                        } else {
+                            $existingItemProcedures = null;
+                        }
+                        if (isset($existingItemProcedures) && !empty($existingItemProcedures)) {
+                            $mergedItemProcedures = array_merge($existingItemProcedures, $request->item_procedure_id);
+                        } else {
+                            $mergedItemProcedures = $request->item_procedure_id;
+                        }
+                        $uniqueItemProcedures = array_unique($mergedItemProcedures);
+                        $item_procedures = implode(',', $uniqueItemProcedures);
+
+                        if (isset($item->tag) && !empty($item->tag)) {
+                            $existingTags = explode(',', $item->tag);
+                        } else {
+                            $existingTags = null;
+                        }
+                        if (isset($existingTags) && !empty($existingTags)) {
+                            $mergedTags = array_merge($existingTags, $request->tags);
+                        } else {
+                            $mergedTags = $request->tags;
+                        }
+                        $uniqueTags = array_unique($mergedTags);
+                        $mergedTagString = implode(',', $uniqueTags);
+                        if (isset($item_procedures) && !empty($item_procedures)) {
+                            $item->item_procedure_id = $item_procedures;
+                        }
+                        if (isset($mergedTagString) && !empty($mergedTagString)) {
+                            $item->tag = $mergedTagString;
+                        }
+                        if (isset($request->price) && !empty($request->price)) {
+                            $item->price = $request->price;
+                        }
+                        if (isset($request->store_qty) && !empty($request->store_qty)) {
+                            $item->store_qty = $request->store_qty;
+                        }
+                        if (isset($request->min_level) && !empty($request->min_level)) {
+                            $item->min_level = $request->min_level;
+                        }
+                        if (isset($request->item_notes) && !empty($request->item_notes)) {
+                            $item->item_notes = $request->item_notes;
+                        }
+                        $item->save();
+                        if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+                            $procedureIds = explode(',', $item->item_procedure_id);
+                            ItemProcedure::where('item_id', $item->id)->delete();
+                            foreach ($procedureIds as $procedure_id) {
+                                $itemProcedure = new ItemProcedure();
+                                $itemProcedure->item_id = $item->id;
+                                $itemProcedure->procedure_id = $procedure_id;
+                                $itemProcedure->save();
+                            }
+                        }
+                    } else{
+                        return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
+                    }
+                }
+                return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200]);
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
