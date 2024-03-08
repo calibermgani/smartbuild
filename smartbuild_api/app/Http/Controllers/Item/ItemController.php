@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Item\Item;
 use App\Models\Item\ItemProcedure;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -113,7 +114,16 @@ class ItemController extends Controller
                     })
                     ->whereNull('item_clone_id')
                     ->get();
-                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
+                    $itemsWithImageUrl = $items->map(function ($item) {
+                        if ($item->image_url) {
+                            $imageUrl = Storage::url('item_images/'.$item->image_url);
+                        } else {
+                            $imageUrl = null;
+                        }
+                        $item->setAttribute('image_url', $imageUrl);
+                        return $item;
+                    });
+                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $itemsWithImageUrl], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
             }
@@ -156,6 +166,16 @@ class ItemController extends Controller
                 $request['item_procedure_id'] = implode(',', $request->item_procedure_id);
             } else {
                 $request['item_procedure_id'] = null;
+            }
+            if ($request->hasFile('item_image')) {
+                $filenameWithExt = $request->file('item_image')->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request->file('item_image')->getClientOriginalExtension();
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                $request['image_url'] = $fileNameToStore;
+            }else{
+                $request['image_url'] = null;
             }
             $item = Item::create($request->all());
             if ($item) {
