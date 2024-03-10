@@ -26,14 +26,13 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $categories = Category::with(['sub_category'])
-                ->whereHas('sub_category' , function ($query) use ($request) {
-                    if (isset($request->category_search) && !empty($request->category_search)) {
-                        $query->where('sub_category_name', 'like', '%' . $request->category_search . '%');
-                    } else {
-                        $query;
-                    }
-                })
+            $categories = Category::with(['sub_category' => function ($query) {
+                if (isset($request->category_search) && !empty($request->category_search)) {
+                    $query->orWhere('sub_category_name', 'like', '%' . $request->category_search . '%');
+                } else {
+                    $query;
+                }
+            }])
                 ->orWhere(function ($query) use ($request) {
                     if (isset($request->category_search) && !empty($request->category_search)) {
                         $query->where('name', 'like', '%' . $request->category_search . '%');
