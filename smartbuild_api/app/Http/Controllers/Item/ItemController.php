@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Item\Item;
 use App\Models\Item\ItemProcedure;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ItemController extends Controller
 {
@@ -352,7 +353,7 @@ class ItemController extends Controller
                         return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                     }
                 }
-                return response()->json(['status' => 'Success', 'message' => 'Item quantities updated successfully', 'code' => 200]);
+                return response()->json(['status' => 'Success', 'message' => 'Item Tags updated successfully', 'code' => 200]);
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
@@ -562,6 +563,31 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function itemRecall(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $item_recall = Item::select([
+                'item_number as item_number',
+                'item_name as item_name',
+                'lot_no as lot_no',
+                DB::raw('SUM(COALESCE(store_qty, 0)) as store_qty'),
+                ])
+                ->where('tag', 'like', '%Recall%')
+                ->groupBy('item_number', 'item_name', 'lot_no')
+                ->get()->toArray();
+
+            return response()->json(['status' => 'Success', 'message' => 'Item recall successfully', 'code' => 200, 'total' => count($item_recall), 'data' => $item_recall]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 }
