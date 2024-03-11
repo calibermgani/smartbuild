@@ -83,7 +83,7 @@ class ItemController extends Controller
                             $query;
                         }
                         if (!empty($min_store_qty) && !empty($max_store_qty)) {
-                            $query->whereBetween('cabinet_qty', [$min_store_qty, $max_store_qty]);
+                            $query->whereBetween('store_qty', [$min_store_qty, $max_store_qty]);
                         } else {
                             $query;
                         }
