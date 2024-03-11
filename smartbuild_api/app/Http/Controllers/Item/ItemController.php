@@ -544,15 +544,14 @@ class ItemController extends Controller
             }
             if (isset($request->item_id) && !empty($request->item_id)) {
                 foreach ($request->item_id as $key => $item_id) {
-                    $old_item_set_alert = ItemSetAlertNotification::find($item_id);
-                    if (isset($old_item_set_alert) && !empty($old_item_set_alert)) {
-                        $old_item_set_alert->delete();
-                    }
+                    ItemSetAlertNotification::where('item_id', $item_id)->delete();
+
                     $item_set_alert = new ItemSetAlertNotification;
                     $item_set_alert->item_id = $item_id;
                     $item_set_alert->vendor_id = $request->vendor_id;
                     $item_set_alert->set_alert_type_id = $request->set_alert_type_id;
                     $item_set_alert->min_level = $request->min_level;
+                    $item_set_alert->alert_notification = 'No';
                     $item_set_alert->created_by = $request->created_by;
                     $item_set_alert->save();
                 }
