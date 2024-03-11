@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
+use App\Models\Item\ItemSetAlertNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -524,6 +525,36 @@ class ItemController extends Controller
                     } else{
                         return response()->json(['status' => 'error', 'message' => 'Invalid input data', 'code' => 400]);
                     }
+                }
+                return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200]);
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+    public function itemSetAlert(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->item_id) && !empty($request->item_id)) {
+                foreach ($request->item_id as $key => $item_id) {
+                    $old_item_set_alert = ItemSetAlertNotification::find($item_id);
+                    if (isset($old_item_set_alert) && !empty($old_item_set_alert)) {
+                        $old_item_set_alert->delete();
+                    }
+                    $item_set_alert = new ItemSetAlertNotification;
+                    $item_set_alert->item_id = $item_id;
+                    $item_set_alert->vendor_id = $request->vendor_id;
+                    $item_set_alert->set_alert_type_id = $request->set_alert_type_id;
+                    $item_set_alert->min_level = $request->min_level;
+                    $item_set_alert->created_by = $request->created_by;
+                    $item_set_alert->save();
                 }
                 return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200]);
             } else {
