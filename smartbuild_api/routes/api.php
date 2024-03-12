@@ -85,6 +85,7 @@ Route::prefix('items')->group(function () {
     Route::any('/item_set_alert', [ItemController::class, 'itemSetAlert']);
     Route::any('/item_recall', [ItemController::class, 'itemRecall']);
     Route::any('/item_refill_to_cabinet', [ItemController::class, 'itemRefillToCabinet']);
+    Route::any('/near_expired_items', [ItemController::class, 'nearExpiredItems']);
 });
 
 Route::prefix('sizes')->group(function () {

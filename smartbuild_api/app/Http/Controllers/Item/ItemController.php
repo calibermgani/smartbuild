@@ -614,4 +614,31 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+    public function nearExpiredItems(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $startDate = Carbon::now()->format('Y-m-d');
+            $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
+
+            $nearExpiredItems = Item::select([
+                'item_number as item_number',
+                'item_name as item_name',
+                DB::raw('SUM(COALESCE(store_qty, 0)) as total_store_qty'),
+                'expired_date as expired_date'
+                ])
+                ->whereBetween('expired_date', [$startDate, $endDate])
+                ->groupBy('item_number', 'item_name', 'expired_date')
+                ->get()->toArray();
+
+            return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
