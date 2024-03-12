@@ -590,4 +590,28 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function itemRefillToCabinet(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $item_refill_to_cabinet = Item::select([
+                'item_number as item_number',
+                'item_name as item_name',
+                DB::raw('SUM(COALESCE(cabinet_qty, 0)) as cabinet_total_qty'),
+                ])
+                ->groupBy('item_number', 'item_name')
+                ->havingRaw('SUM(COALESCE(cabinet_qty, 0)) <= 50')
+                ->get()->toArray();
+
+            return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($item_refill_to_cabinet), 'data' => $item_refill_to_cabinet]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
