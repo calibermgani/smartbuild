@@ -285,7 +285,7 @@ class ItemController extends Controller
                 $item->deletet_by = $request->deleted_by;
                 $item->delete();
             }
-            return response()->json(['status' => 'Success', 'message' => 'Sub Category deleted successfully', 'code' => 200]);
+            return response()->json(['status' => 'Success', 'message' => 'Item deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
