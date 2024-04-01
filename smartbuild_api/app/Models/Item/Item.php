@@ -60,25 +60,14 @@ class Item extends Model
             ],
             'item_name' => [
                 'required',
-                Rule::unique('items', 'item_name')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
             ],
             'item_category_id' => [
                 'required',
             ],
             'item_barcode' => [
                 'required',
-                Rule::unique('items', 'item_barcode')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
             ],
             'price' => [
-                'required',
-            ],
-            'size' => [
-                'required',
-            ],
-            'unit' => [
-                'required',
-            ],
-            'expired_date' => [
                 'required',
             ],
             'min_level' => [
