@@ -209,6 +209,12 @@ class ItemController extends Controller
             }
 
             $item = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->findOrFail($request->item_id);
+            if ($item->image_url) {
+                $imageUrl = Storage::url('item_images/'.$item->image_url);
+            } else {
+                $imageUrl = null;
+            }
+            $item->setAttribute('image_url', $imageUrl);
             return response()->json(['status' => 'Success', 'message' => 'Item retrieved successfully', 'code' => 200 , 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
