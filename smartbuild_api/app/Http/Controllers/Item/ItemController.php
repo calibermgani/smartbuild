@@ -61,7 +61,7 @@ class ItemController extends Controller
                     $min_min_level = "";
                     $max_min_level = "";
                 }
-                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures', 'item_clones'])
+                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
                     ->where(function ($query) use ($request, $min_cabinet_qty, $max_cabinet_qty, $min_price, $max_price, $min_min_level, $max_min_level, $min_store_qty, $max_store_qty) {
                         if (isset($request->item_category_id) && !empty($request->item_category_id)) {
                             $query->where('item_category_id', $request->item_category_id);
@@ -114,7 +114,6 @@ class ItemController extends Controller
                             $query;
                         }
                     })
-                    ->whereNull('item_clone_id')
                     ->get();
                     $itemsWithImageUrl = $items->map(function ($item) {
                         if ($item->image_url) {
@@ -152,7 +151,7 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(Item::rules());
-            if (isset($request->tag) && !empty($request->tag)) {
+            if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
                 $request['tag'] = null;
@@ -164,7 +163,7 @@ class ItemController extends Controller
                 $request['spid'] = 'SPV'. Carbon::now()->year . 1;
             }
             $request['item_entry_status'] = 'create';
-            if (count($request->item_procedure_id) > 0) {
+            if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
                 $request['item_procedure_id'] = implode(',', $request->item_procedure_id);
             } else {
                 $request['item_procedure_id'] = null;
@@ -181,7 +180,7 @@ class ItemController extends Controller
             }
             $item = Item::create($request->all());
             if ($item) {
-                if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+                if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
                     $procedureIds = explode(',', $request->item_procedure_id);
                     foreach ($procedureIds as $procedure_id) {
                         $itemProcedure = new ItemProcedure();
@@ -236,13 +235,13 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(Item::rules($request->item_id));
-            if (isset($request->tag) && !empty($request->tag)) {
+            if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
                 $request['tag'] = null;
             }
             $request['item_entry_status'] = 'update';
-            if (count($request->item_procedure_id) > 0) {
+            if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
                 $request['item_procedure_id'] = implode(',', $request->item_procedure_id);
             } else {
                 $request['item_procedure_id'] = null;
@@ -250,7 +249,7 @@ class ItemController extends Controller
             $item = Item::findOrFail($request->item_id);
             $item->update($request->all());
 
-            if (isset($request->item_procedure_id) && !empty($request->item_procedure_id)) {
+            if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
                 $item_procedure_ids = explode(',', $request->item_procedure_id);
                 ItemProcedure::where('item_id', $item->id)->delete();
                 foreach ($item_procedure_ids as $procedure_id) {
