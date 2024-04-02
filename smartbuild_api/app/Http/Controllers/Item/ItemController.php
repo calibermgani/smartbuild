@@ -117,7 +117,7 @@ class ItemController extends Controller
                     ->get();
                     $itemsWithImageUrl = $items->map(function ($item) {
                         if ($item->image_url) {
-                            $imageUrl = Storage::url('item_images/'.$item->image_url);
+                            $imageUrl = url(Storage::url('item_images/'.$item->spid.'/'.$item->image_url));
                         } else {
                             $imageUrl = null;
                         }
@@ -210,7 +210,7 @@ class ItemController extends Controller
 
             $item = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->findOrFail($request->item_id);
             if ($item->image_url) {
-                $imageUrl = Storage::url('item_images/'.$item->image_url);
+                $imageUrl = url(Storage::url('item_images/'.$item->spid.'/'.$item->image_url));
             } else {
                 $imageUrl = null;
             }
