@@ -24,7 +24,7 @@ class VendorController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $vendors = Vendor::get();
+            $vendors = Vendor::orderBy('id', 'desc')->get();
             return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200, 'data' => $vendors], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
