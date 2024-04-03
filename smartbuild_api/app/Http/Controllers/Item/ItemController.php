@@ -240,7 +240,7 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Item::rules($request->item_id));
+            // $data = $request->validate(Item::rules($request->item_id));
             if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
