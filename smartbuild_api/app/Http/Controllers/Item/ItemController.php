@@ -117,7 +117,7 @@ class ItemController extends Controller
                     ->get();
                     $itemsWithImageUrl = $items->map(function ($item) {
                         if ($item->image_url) {
-                            $imageUrl = url(Storage::url('item_images/'.$item->spid.'/'.$item->image_url));
+                            $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
                         } else {
                             $imageUrl = null;
                         }
@@ -173,7 +173,12 @@ class ItemController extends Controller
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension = $request->file('item_image')->getClientOriginalExtension();
                 $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-                $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                if (!Storage::exists('public/item_images/' . $request['spid'])) {
+                    $storage_path = Storage::makeDirectory('public/item_images/' . $request['spid'], 0775, true);
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                } else {
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                }
                 $request['image_url'] = $fileNameToStore;
             }else{
                 $request['image_url'] = null;
@@ -210,7 +215,7 @@ class ItemController extends Controller
 
             $item = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->findOrFail($request->item_id);
             if ($item->image_url) {
-                $imageUrl = url(Storage::url('item_images/'.$item->spid.'/'.$item->image_url));
+                $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
             } else {
                 $imageUrl = null;
             }
@@ -258,7 +263,12 @@ class ItemController extends Controller
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension = $request->file('item_image')->getClientOriginalExtension();
                 $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-                $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
+                if (!Storage::exists('public/item_images/' . $request['spid'])) {
+                    $storage_path = Storage::makeDirectory('public/item_images/' . $request['spid'], 0775, true);
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                } else {
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                }
                 $request['image_url'] = $fileNameToStore;
             }else{
                 $request['image_url'] = null;
