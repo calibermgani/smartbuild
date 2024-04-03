@@ -666,4 +666,46 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function trashedItems(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = item::onlyTrashed()->get();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Trash item retrieved successfully', 'code' => 200, 'items' => $data]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function restoredItems(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->item_id) && !empty($request->item_id)) {
+                foreach ($request->item_id as $key => $item_id) {
+                    $item = Item::withTrashed()->find($item_id);
+                    if (isset($item) && !empty($item)) {
+                        $item->deleted_at = null;
+                        $item->save();
+                    }
+                }
+                return response()->json(['status' => 'Success', 'message' => 'Item resorted successfully', 'code' => 200]);
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
 }
