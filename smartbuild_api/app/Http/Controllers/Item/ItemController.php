@@ -603,10 +603,9 @@ class ItemController extends Controller
                 'item_number as item_number',
                 'item_name as item_name',
                 'lot_no as lot_no',
-                DB::raw('SUM(COALESCE(store_qty, 0)) as store_qty'),
+                DB::raw('COALESCE(store_qty, 0) as store_qty'),
                 ])
                 ->where('tag', 'like', '%Recall%')
-                ->groupBy('item_number', 'item_name', 'lot_no')
                 ->get()->toArray();
 
             return response()->json(['status' => 'Success', 'message' => 'Item recall successfully', 'code' => 200, 'total' => count($item_recall), 'data' => $item_recall]);
@@ -627,10 +626,9 @@ class ItemController extends Controller
             $item_refill_to_cabinet = Item::select([
                 'item_number as item_number',
                 'item_name as item_name',
-                DB::raw('SUM(COALESCE(cabinet_qty, 0)) as cabinet_total_qty'),
+                DB::raw('COALESCE(cabinet_qty, 0) as cabinet_total_qty'),
                 ])
-                ->groupBy('item_number', 'item_name')
-                ->havingRaw('SUM(COALESCE(cabinet_qty, 0)) <= 50')
+                ->havingRaw('COALESCE(cabinet_qty, 0) <= 50')
                 ->get()->toArray();
 
             return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($item_refill_to_cabinet), 'data' => $item_refill_to_cabinet]);
