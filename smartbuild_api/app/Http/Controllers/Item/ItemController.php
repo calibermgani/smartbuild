@@ -653,11 +653,10 @@ class ItemController extends Controller
             $nearExpiredItems = Item::select([
                 'item_number as item_number',
                 'item_name as item_name',
-                DB::raw('SUM(COALESCE(store_qty, 0)) as total_store_qty'),
+                DB::raw('COALESCE(store_qty, 0) as total_store_qty'),
                 'expired_date as expired_date'
                 ])
                 ->whereBetween('expired_date', [$startDate, $endDate])
-                ->groupBy('item_number', 'item_name', 'expired_date')
                 ->get()->toArray();
 
             return response()->json(['status' => 'Success', 'message' => 'Near expiry items successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
@@ -674,7 +673,7 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = item::onlyTrashed()->get();
+            $data = item::onlyTrashed()->with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->get();
             $itemsWithImageUrl = $data->map(function ($item) {
             if ($item->image_url) {
                 $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
