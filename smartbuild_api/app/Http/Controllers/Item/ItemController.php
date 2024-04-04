@@ -628,7 +628,7 @@ class ItemController extends Controller
                 'item_name as item_name',
                 DB::raw('COALESCE(cabinet_qty, 0) as cabinet_total_qty'),
                 ])
-                ->havingRaw('COALESCE(cabinet_qty, 0) <= 50')
+                ->whereRaw('COALESCE(cabinet_qty, 0) <= 50')
                 ->get()->toArray();
 
             return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($item_refill_to_cabinet), 'data' => $item_refill_to_cabinet]);
