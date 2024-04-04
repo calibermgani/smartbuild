@@ -27,12 +27,12 @@ class CategoryController extends Controller
             }
 
             $categories = Category::with(['sub_category' => function ($query) use ($request) {
-                if (isset($request->category_search) && !empty($request->category_search)) {
-                    $query->orWhere('sub_category_name', 'like', '%' . $request->category_search . '%');
-                } else {
-                    $query;
-                }
-            }])
+                    if (isset($request->category_search) && !empty($request->category_search)) {
+                        $query->orWhere('sub_category_name', 'like', '%' . $request->category_search . '%');
+                    } else {
+                        $query;
+                    }
+                }])
                 ->orWhere(function ($query) use ($request) {
                     if (isset($request->category_search) && !empty($request->category_search)) {
                         $query->where('name', 'like', '%' . $request->category_search . '%');
@@ -40,7 +40,14 @@ class CategoryController extends Controller
                         $query;
                     }
                 })
-                ->where('status','Active')
+                ->where('status', 'Active')
+                ->where(function ($query) {
+                    $query->whereHas('sub_category', function ($query) {
+                        $query->where('status', 'Active')
+                              ->orWhereNull('deleted_at');
+                    })
+                    ->orWhereDoesntHave('sub_category');
+                })
                 ->get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'total_count' => count($categories), 'data' => $categories], 200);
         } catch (\Exception $e) {

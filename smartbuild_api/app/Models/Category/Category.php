@@ -2,6 +2,7 @@
 
 namespace App\Models\Category;
 
+use App\Models\Item\Item;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,5 +40,9 @@ class Category extends Model
     public function sub_category(): HasMany
     {
         return $this->hasMany(SubCategory::class, 'category_id', 'id');
+    }
+    public function category_item(): HasMany
+    {
+        return $this->hasMany(Item::class, 'item_category_id', 'id');
     }
 }

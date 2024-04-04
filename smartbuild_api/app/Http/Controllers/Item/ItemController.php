@@ -61,7 +61,7 @@ class ItemController extends Controller
                     $min_min_level = "";
                     $max_min_level = "";
                 }
-                $items = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                $items = Item::with(['item_category' ,'item_sub_category','item_vendor', 'item_procedures'])
                     ->where(function ($query) use ($request, $min_cabinet_qty, $max_cabinet_qty, $min_price, $max_price, $min_min_level, $max_min_level, $min_store_qty, $max_store_qty) {
                         if (isset($request->item_category_id) && !empty($request->item_category_id)) {
                             $query->where('item_category_id', $request->item_category_id);
@@ -114,6 +114,17 @@ class ItemController extends Controller
                             $query;
                         }
                     })
+                    ->whereHas('item_category', function ($query) {
+                        $query->where('status', 'Active')
+                              ->whereNull('deleted_at');
+                    })
+                    ->where(function ($query) use ($request) {
+                        $query->whereHas('item_sub_category', function ($query) use ($request) {
+                            $query->where('status', 'Active')
+                                  ->whereNull('deleted_at');
+                        })->orWhereNull('item_sub_category_id');
+                    })
+                    ->orderBy('id', 'desc')
                     ->get();
                     $itemsWithImageUrl = $items->map(function ($item) {
                         if ($item->image_url) {
@@ -671,15 +682,28 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = item::onlyTrashed()->with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])->get();
+            $data = item::onlyTrashed()
+                ->with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                ->whereHas('item_category', function ($query) {
+                    $query->where('status', 'Active')
+                          ->whereNull('deleted_at');
+                })
+                ->where(function ($query) use ($request) {
+                    $query->whereHas('item_sub_category', function ($query) use ($request) {
+                        $query->where('status', 'Active')
+                              ->whereNull('deleted_at');
+                    })->orWhereNull('item_sub_category_id');
+                })
+                ->orderBy('id', 'desc')
+                ->get();
             $itemsWithImageUrl = $data->map(function ($item) {
-            if ($item->image_url) {
-                $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
-            } else {
-                $imageUrl = null;
-            }
-            $item->setAttribute('image_url', $imageUrl);
-            return $item;
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
             });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
@@ -710,6 +734,39 @@ class ItemController extends Controller
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function itemsCategorySearch(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                ->where('item_category_id', $request->item_category_id)
+                ->where(function ($query) use ($request) {
+                    if (isset($request->item_sub_category_id) && !empty($request->item_sub_category_id)) {
+                        $query->where('item_sub_category_id', $request->item_sub_category_id);
+                    }else{
+                        $query;
+                    }
+                })
+                ->orderBy('id', 'desc')
+                ->get();
+                $itemsWithImageUrl = $data->map(function ($item) {
+                    if ($item->image_url) {
+                        $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                    } else {
+                        $imageUrl = null;
+                    }
+                    $item->setAttribute('image_url', $imageUrl);
+                    return $item;
+                });
+            return response()->json(['status' => 'Success', 'message' => 'Category item retrieved successfully', 'code' => 200 , 'total_couunt' => count($data), 'items' => $data]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
