@@ -263,11 +263,11 @@ class ItemController extends Controller
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension = $request->file('item_image')->getClientOriginalExtension();
                 $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-                if (!Storage::exists('public/item_images/' . $request['spid'])) {
-                    $storage_path = Storage::makeDirectory('public/item_images/' . $request['spid'], 0775, true);
-                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                if (!Storage::exists('public/item_images/' . $item['spid'])) {
+                    $storage_path = Storage::makeDirectory('public/item_images/' . $item['spid'], 0775, true);
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
                 } else {
-                    $path = $request->file('item_image')->storeAs('public/item_images/' . $request['spid'], $fileNameToStore);
+                    $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
                 }
                 $request['image_url'] = $fileNameToStore;
             }else{
