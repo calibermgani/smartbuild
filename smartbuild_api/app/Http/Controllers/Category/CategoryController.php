@@ -40,6 +40,7 @@ class CategoryController extends Controller
                         $query;
                     }
                 })
+                ->where('status','Active')
                 ->get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'total_count' => count($categories), 'data' => $categories], 200);
         } catch (\Exception $e) {

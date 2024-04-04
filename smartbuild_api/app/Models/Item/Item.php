@@ -70,7 +70,7 @@ class Item extends Model
             'price' => [
                 'required',
             ],
-            'min_level' => [
+            'expired_date' => [
                 'required',
             ],
         ];
