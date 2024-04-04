@@ -675,6 +675,15 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = item::onlyTrashed()->get();
+            $itemsWithImageUrl = $data->map(function ($item) {
+            if ($item->image_url) {
+                $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+            } else {
+                $imageUrl = null;
+            }
+            $item->setAttribute('image_url', $imageUrl);
+            return $item;
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
