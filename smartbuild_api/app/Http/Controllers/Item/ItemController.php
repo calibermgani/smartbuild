@@ -114,6 +114,11 @@ class ItemController extends Controller
                         } else {
                             $query;
                         }
+                        if (isset($request->item_barcode) && !empty($request->item_barcode)) {
+                            $query->where('index_barcode','like', '%' . $request->item_barcode . '%');
+                        } else {
+                            $query;
+                        }
                     })
                     ->whereHas('item_category', function ($query) {
                         $query->where('status', 'Active')
