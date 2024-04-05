@@ -688,14 +688,15 @@ class ItemController extends Controller
                     }
                 })
                 ->get();
-
-            if ($nearExpiredItems->image_url) {
-                $imageUrl = Storage::url('item_images/'.$nearExpiredItems->spid.'/'.$nearExpiredItems->image_url);
-            } else {
-                $imageUrl = null;
-            }
-            $nearExpiredItems->setAttribute('image_url', $imageUrl);
-
+            $itemsWithImageUrl = $nearExpiredItems->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
             return response()->json(['status' => 'Success', 'message' => 'Near expiry items successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
