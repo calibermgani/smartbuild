@@ -668,6 +668,13 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
+            if (isset($request->expired_date) && !empty($request->expired_date)) {
+                $start_expired_date = date('Y-m-d', strtotime($request->expired_date[0]));
+                $end_expired_date = date('Y-m-d', strtotime($request->expired_date[1]));
+            } else {
+                $start_expired_date = "";
+                $end_expired_date = "";
+            }
             $startDate = Carbon::now()->format('Y-m-d');
             $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
 
@@ -679,9 +686,9 @@ class ItemController extends Controller
                 'expired_date as expired_date'
                 ])
                 ->whereBetween('expired_date', [$startDate, $endDate])
-                ->where(function ($query) use ($request) {
-                    if(isset($request->expired_date) && !empty($request->expired_date)){
-                        $query->where('expired_date', $request->expired_date);
+                ->where(function ($query) use ($start_expired_date, $end_expired_date) {
+                    if(!empty($start_expired_date) && !empty($end_expired_date)){
+                        $query->whereBetween('expired_date', [$start_expired_date, $end_expired_date]);
                     }else{
                         $query;
                     }
