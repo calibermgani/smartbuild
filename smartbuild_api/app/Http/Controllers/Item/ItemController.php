@@ -616,6 +616,7 @@ class ItemController extends Controller
             }
 
             $item_recall = Item::select([
+                'id as id',
                 'item_number as item_number',
                 'item_name as item_name',
                 'lot_no as lot_no',
@@ -640,6 +641,7 @@ class ItemController extends Controller
             }
 
             $item_refill_to_cabinet = Item::select([
+                'id as id',
                 'item_number as item_number',
                 'item_name as item_name',
                 DB::raw('COALESCE(cabinet_qty, 0) as cabinet_total_qty'),
@@ -665,6 +667,7 @@ class ItemController extends Controller
             $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
 
             $nearExpiredItems = Item::select([
+                'id as id',
                 'item_number as item_number',
                 'item_name as item_name',
                 DB::raw('COALESCE(store_qty, 0) as total_store_qty'),
@@ -752,8 +755,12 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
-                ->where('item_category_id', $request->item_category_id)
                 ->where(function ($query) use ($request) {
+                    if (isset($request->item_category_id) && !empty($request->item_category_id)) {
+                        $query->where('item_category_id', $request->item_category_id);
+                    } else {
+                        $query;
+                    }
                     if (isset($request->item_sub_category_id) && !empty($request->item_sub_category_id)) {
                         $query->where('item_sub_category_id', $request->item_sub_category_id);
                     }else{

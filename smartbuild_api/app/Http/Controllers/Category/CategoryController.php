@@ -25,29 +25,22 @@ class CategoryController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
+            $searchTerm = $request->input('category_search');
 
-            $categories = Category::with(['sub_category' => function ($query) use ($request) {
-                    if (isset($request->category_search) && !empty($request->category_search)) {
-                        $query->orWhere('sub_category_name', 'like', '%' . $request->category_search . '%');
-                    } else {
-                        $query;
-                    }
+            $categories = Category::where('status', 'Active')
+                ->whereNull('deleted_at')
+                ->where(function ($query) use ($searchTerm) {
+                    $query->where('name', 'like', '%' . $searchTerm . '%')
+                        ->orWhereHas('sub_category', function ($subQuery) use ($searchTerm) {
+                            $subQuery->where('sub_category_name', 'like', '%' . $searchTerm . '%')
+                                ->where('status', 'Active');
+                        });
+                })
+                ->with(['sub_category' => function ($query) use ($searchTerm) {
+                    $query->where('status', 'Active')
+                        ->where('sub_category_name', 'like', '%' . $searchTerm . '%')
+                        ->whereNull('deleted_at');
                 }])
-                ->orWhere(function ($query) use ($request) {
-                    if (isset($request->category_search) && !empty($request->category_search)) {
-                        $query->where('name', 'like', '%' . $request->category_search . '%');
-                    } else {
-                        $query;
-                    }
-                })
-                ->where('status', 'Active')
-                ->where(function ($query) {
-                    $query->whereHas('sub_category', function ($query) {
-                        $query->where('status', 'Active')
-                              ->orWhereNull('deleted_at');
-                    })
-                    ->orWhereDoesntHave('sub_category');
-                })
                 ->get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'total_count' => count($categories), 'data' => $categories], 200);
         } catch (\Exception $e) {
