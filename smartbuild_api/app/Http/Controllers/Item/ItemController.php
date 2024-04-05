@@ -678,13 +678,7 @@ class ItemController extends Controller
             $startDate = Carbon::now()->format('Y-m-d');
             $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
 
-            $nearExpiredItems = Item::select([
-                'id as id',
-                'item_number as item_number',
-                'item_name as item_name',
-                DB::raw('COALESCE(store_qty, 0) as total_store_qty'),
-                'expired_date as expired_date'
-                ])
+            $nearExpiredItems = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
                 ->whereBetween('expired_date', [$startDate, $endDate])
                 ->where(function ($query) use ($start_expired_date, $end_expired_date) {
                     if(!empty($start_expired_date) && !empty($end_expired_date)){
@@ -693,7 +687,14 @@ class ItemController extends Controller
                         $query;
                     }
                 })
-                ->get()->toArray();
+                ->get();
+
+            if ($nearExpiredItems->image_url) {
+                $imageUrl = Storage::url('item_images/'.$nearExpiredItems->spid.'/'.$nearExpiredItems->image_url);
+            } else {
+                $imageUrl = null;
+            }
+            $nearExpiredItems->setAttribute('image_url', $imageUrl);
 
             return response()->json(['status' => 'Success', 'message' => 'Near expiry items successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
         } catch (\Exception $e) {
