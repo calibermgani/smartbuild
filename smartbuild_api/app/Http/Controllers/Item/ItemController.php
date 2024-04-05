@@ -674,6 +674,13 @@ class ItemController extends Controller
                 'expired_date as expired_date'
                 ])
                 ->whereBetween('expired_date', [$startDate, $endDate])
+                ->where(function ($query) use ($request) {
+                    if(isset($request->expired_date) && !empty($request->expired_date)){
+                        $query->where('expired_date', $request->expired_date);
+                    }else{
+                        $query;
+                    }
+                })
                 ->get()->toArray();
 
             return response()->json(['status' => 'Success', 'message' => 'Near expiry items successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
