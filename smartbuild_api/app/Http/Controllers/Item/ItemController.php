@@ -11,6 +11,7 @@ use App\Models\Item\Item;
 use App\Models\Item\ItemProcedure;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\File;
 
 class ItemController extends Controller
 {
@@ -411,11 +412,15 @@ class ItemController extends Controller
             if (count($itemCheck) > 0) {
                 foreach ($itemCheck as $key => $item) {
                     $lastItem = Item::orderBy('id', 'desc')->first();
+                    $sourcePath = 'public/item_images/' . $item->spid . '/' . $item->image_url;
                     if (isset($lastItem) && !empty($lastItem)) {
                         $item['spid'] = 'SPV' . Carbon::now()->year . $lastItem->id + 1;
                     } else {
                         $item['spid'] = 'SPV'. Carbon::now()->year . 1;
                     }
+                    $storage_path = Storage::makeDirectory('public/item_images/' . $item['spid'], 0775, true);
+                    $destinationPath = 'public/item_images/' . $item->spid . '/' . $item->image_url;
+                    Storage::copy($sourcePath, $destinationPath);
                     $clone = new Item();
                     $clone->spid = $item['spid'];
                     $clone->item_clone_id = $item['id'];
