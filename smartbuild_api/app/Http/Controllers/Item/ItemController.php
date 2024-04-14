@@ -120,16 +120,16 @@ class ItemController extends Controller
                             $query;
                         }
                     })
-                    ->whereHas('item_category', function ($query) {
-                        $query->where('status', 'Active')
-                              ->whereNull('deleted_at');
-                    })
-                    ->where(function ($query) use ($request) {
-                        $query->whereHas('item_sub_category', function ($query) use ($request) {
-                            $query->where('status', 'Active')
-                                  ->whereNull('deleted_at');
-                        })->orWhereNull('item_sub_category_id');
-                    })
+                    // ->whereHas('item_category', function ($query) {
+                    //     $query->where('status', 'Active')
+                    //           ->whereNull('deleted_at');
+                    // })
+                    // ->where(function ($query) use ($request) {
+                    //     $query->whereHas('item_sub_category', function ($query) use ($request) {
+                    //         $query->where('status', 'Active')
+                    //               ->whereNull('deleted_at');
+                    //     })->orWhereNull('item_sub_category_id');
+                    // })
                     ->orderBy('id', 'desc')
                     ->get();
                     $itemsWithImageUrl = $items->map(function ($item) {
