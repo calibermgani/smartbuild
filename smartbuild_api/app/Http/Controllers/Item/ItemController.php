@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
 use App\Models\Item\ItemSetAlertNotification;
+use App\Models\Procedure\Procedure;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -132,6 +133,29 @@ class ItemController extends Controller
                     // })
                     ->orderBy('id', 'desc')
                     ->get();
+                    $itemsStatus = $items->map(function ($item) {
+                        if(isset($item->item_status) && !empty($item->item_status)) {
+                            if ($item->item_status == 1) {
+                                $status = 'Active';
+                            } else {
+                                $status = 'Inactive';
+                            }
+                            $item->setAttribute('item_status', $status);
+                            return $item;
+                        }
+                    });
+                    $itemsProcedures = $items->map(function ($item) {
+                        if(isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                            $data = explode(',', $item->item_procedure_id);
+                            $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
+                                ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
+                                ->whereIn('item_procedures.procedure_id', $data)
+                                ->groupBy('item_procedures.item_id')
+                                ->first();
+                            $item->setAttribute('item_procedure_id', $procedures->procedure_names);
+                            return $item;
+                        }
+                    });
                     $itemsWithImageUrl = $items->map(function ($item) {
                         if ($item->image_url) {
                             $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
@@ -141,7 +165,7 @@ class ItemController extends Controller
                         $item->setAttribute('image_url', $imageUrl);
                         return $item;
                     });
-                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $itemsWithImageUrl], 200);
+                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
             }
