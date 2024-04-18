@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category\Category;
+use App\Models\Category\SubCategory;
 use App\Models\Item\ItemSetAlertNotification;
 use App\Models\Procedure\Procedure;
+use App\Models\Vendor\Vendor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -735,21 +738,10 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = item::onlyTrashed()
-                ->with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
-                ->whereHas('item_category', function ($query) {
-                    $query->where('status', 'Active')
-                          ->whereNull('deleted_at');
-                })
-                ->where(function ($query) use ($request) {
-                    $query->whereHas('item_sub_category', function ($query) use ($request) {
-                        $query->where('status', 'Active')
-                              ->whereNull('deleted_at');
-                    })->orWhereNull('item_sub_category_id');
-                })
+            $data['items'] = item::onlyTrashed()->with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
                 ->orderBy('id', 'desc')
                 ->get();
-            $itemsWithImageUrl = $data->map(function ($item) {
+            $itemsWithImageUrl = $data['items']->map(function ($item) {
                 if ($item->image_url) {
                     $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
                 } else {
@@ -758,10 +750,14 @@ class ItemController extends Controller
                 $item->setAttribute('image_url', $imageUrl);
                 return $item;
             });
+            $data['categories'] = Category::onlyTrashed()->with('sub_category')->get();
+            $data['sub_categories'] = SubCategory::onlyTrashed()->with('category')->get();
+            $data['vendors'] = Vendor::onlyTrashed()->get();
+            $data['procedures'] = Procedure::onlyTrashed()->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Trash item retrieved successfully', 'code' => 200, 'items' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Trash data retrieved successfully', 'code' => 200, 'data' => $data]);
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
