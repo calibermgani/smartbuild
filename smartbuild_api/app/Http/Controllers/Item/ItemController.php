@@ -779,10 +779,44 @@ class ItemController extends Controller
                         $item->save();
                     }
                 }
-                return response()->json(['status' => 'Success', 'message' => 'Item resorted successfully', 'code' => 200]);
-            } else {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
+            if (isset($request->category_id) && !empty($request->category_id)) {
+                foreach ($request->category_id as $key => $category_id) {
+                    $category = Category::withTrashed()->find($category_id);
+                    if (isset($category) && !empty($category)) {
+                        $category->deleted_at = null;
+                        $category->save();
+                    }
+                }
+            }
+            if (isset($request->sub_category_id) && !empty($request->sub_category_id)) {
+                foreach ($request->sub_category_id as $key => $sub_category_id) {
+                    $sub_category = SubCategory::withTrashed()->find($sub_category_id);
+                    if (isset($sub_category) && !empty($sub_category)) {
+                        $sub_category->deleted_at = null;
+                        $sub_category->save();
+                    }
+                }
+            }
+            if (isset($request->vendor_id) && !empty($request->vendor_id)) {
+                foreach ($request->vendor_id as $key => $vendor_id) {
+                    $vendor = Vendor::withTrashed()->find($vendor_id);
+                    if (isset($vendor) && !empty($vendor)) {
+                        $vendor->deleted_at = null;
+                        $vendor->save();
+                    }
+                }
+            }
+            if (isset($request->procedure_id) && !empty($request->procedure_id)) {
+                foreach ($request->procedure_id as $key => $procedure_id) {
+                    $procedure = Procedure::withTrashed()->find($procedure_id);
+                    if (isset($procedure) && !empty($procedure)) {
+                        $procedure->deleted_at = null;
+                        $procedure->save();
+                    }
+                }
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Data resorted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
