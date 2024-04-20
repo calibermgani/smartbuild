@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category\SubCategory;
+use Carbon\Carbon;
 
 class SubCategoryController extends Controller
 {
@@ -28,7 +29,7 @@ class SubCategoryController extends Controller
                     return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
                 }
 
-                $subCategories = SubCategory::with(['category'])->get();
+                $subCategories = SubCategory::with(['category'])->where('status', 'Active')->get();
                 return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code'=>200, 'data' => $subCategories], 200);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -56,6 +57,11 @@ class SubCategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(SubCategory::rules(null, $request->category_id));
+            if ($request->status == 'Inactive') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $subCategory = SubCategory::create($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
@@ -102,6 +108,12 @@ class SubCategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(SubCategory::rules($request->sub_category_id, $request->category_id));
+            
+            if ($request->status == 'Inactive') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $subCategory = SubCategory::findOrFail($request->sub_category_id);
             $subCategory->update($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Sub Category updated successfully', 'code' => 200, 'data' => $subCategory]);
@@ -123,8 +135,12 @@ class SubCategoryController extends Controller
             }
 
             $subCategory = SubCategory::findOrFail($request->sub_category_id);
-            $subCategory->deletet_by = $request->deleted_by;
-            $subCategory->delete();
+            if (isset($subCategory) && !empty($subCategory)) {
+                $subCategory->deleted_by = $request->deleted_by;
+                $subCategory->deleted_reason = $request->deleted_reason;
+                $subCategory->deleted_at = Carbon::now();
+                $subCategory->save();
+            }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);

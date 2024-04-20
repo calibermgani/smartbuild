@@ -23,6 +23,10 @@ class SubCategory extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'deleted_reason',
+        'inactive_by',
+        'inactive_reason',
+        'inactive_date',
     ];
 
     public static function rules($id = null, $categoryId)

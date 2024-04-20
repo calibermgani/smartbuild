@@ -796,6 +796,8 @@ class ItemController extends Controller
                     $sub_category = SubCategory::withTrashed()->find($sub_category_id);
                     if (isset($sub_category) && !empty($sub_category)) {
                         $sub_category->deleted_at = null;
+                        $sub_category->deleted_by = null;
+                        $sub_category->deleted_reason = null;
                         $sub_category->save();
                     }
                 }
