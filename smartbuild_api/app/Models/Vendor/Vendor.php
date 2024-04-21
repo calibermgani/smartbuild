@@ -19,7 +19,13 @@ class Vendor extends Model
         'VendorAddress',
         'status',
         'ContactPerson',
-        'Added_by'
+        'Added_by',
+        'updated_by',
+        'deleted_by',
+        'deleted_reason',
+        'inactive_by',
+        'inactive_reason',
+        'inactive_date'
     ];
     public static function rules($id = null)
     {

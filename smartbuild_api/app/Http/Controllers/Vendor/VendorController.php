@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Vendor\Vendor;
+use Carbon\Carbon;
 
 class VendorController extends Controller
 {
@@ -40,8 +41,12 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $request['Added_by'] = "1";
             $data = $request->validate(Vendor::rules());
+            if ($request->status == 'Inactive') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $vendor = Vendor::create($request->all());
 
             return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200, 'data' => $vendor]);
@@ -74,8 +79,12 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $request['Added_by'] = "1";
             $data = $request->validate(Vendor::rules($request->vendor_id));
+            if ($request->status == 'Inactive') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $vendor = Vendor::findOrFail($request->vendor_id);
             $vendor->update($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200, 'data' => $vendor]);
@@ -94,7 +103,12 @@ class VendorController extends Controller
             }
 
             $vendor = Vendor::findOrFail($request->vendor_id);
-            $vendor->delete();
+            if (isset($vendor) && !empty($vendor)) {
+                $vendor->deleted_by = $request->deleted_by;
+                $vendor->deleted_reason = $request->deleted_reason;
+                $vendor->deleted_at = Carbon::now();
+                $vendor->save();
+            }
             return response()->json(['status' => 'Success', 'message' => 'Vendors deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);

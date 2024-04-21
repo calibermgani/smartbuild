@@ -807,6 +807,8 @@ class ItemController extends Controller
                     $vendor = Vendor::withTrashed()->find($vendor_id);
                     if (isset($vendor) && !empty($vendor)) {
                         $vendor->deleted_at = null;
+                        $vendor->deleted_by = null;
+                        $vendor->deleted_reason = null;
                         $vendor->save();
                     }
                 }
