@@ -878,4 +878,119 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
     }
+
+    public function inactiveItems(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data['items'] = item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                ->where('item_status', 2)
+                ->orderBy('id', 'desc')
+                ->get();
+            $itemsStatus = $data['items']->map(function ($item) {
+                if(isset($item->item_status) && !empty($item->item_status)) {
+                    if ($item->item_status == 1) {
+                        $status = 'Active';
+                    } else {
+                        $status = 'Inactive';
+                    }
+                    $item->setAttribute('item_status', $status);
+                    return $item;
+                }
+            });
+            $itemsWithImageUrl = $data['items']->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
+            $data['categories'] = Category::with('sub_category')->where('status', 'Inactive')->get();
+            $data['sub_categories'] = SubCategory::with('category')->where('status', 'Inactive')->get();
+            $data['vendors'] = Vendor::where('status', 'Inactive')->get();
+            $data['procedures'] = Procedure::where('status', 'Inactive')->get();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Inactive data retrieved successfully', 'code' => 200, 'data' => $data]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function restoredInactiveItems(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->item_id) && !empty($request->item_id)) {
+                foreach ($request->item_id as $key => $item_id) {
+                    $item = Item::withTrashed()->find($item_id);
+                    if (isset($item) && !empty($item)) {
+                        $item->item_status = 1;
+                        $item->inactive_by = null;
+                        $item->inactive_reason = null;
+                        $item->inactive_date = null;
+                        $item->save();
+                    }
+                }
+            }
+            if (isset($request->category_id) && !empty($request->category_id)) {
+                foreach ($request->category_id as $key => $category_id) {
+                    $category = Category::withTrashed()->find($category_id);
+                    if (isset($category) && !empty($category)) {
+                        $category->status = 'Active';
+                        $category->inactive_by = null;
+                        $category->inactive_reason = null;
+                        $category->inactive_date = null;
+                        $category->save();
+                    }
+                }
+            }
+            if (isset($request->sub_category_id) && !empty($request->sub_category_id)) {
+                foreach ($request->sub_category_id as $key => $sub_category_id) {
+                    $sub_category = SubCategory::withTrashed()->find($sub_category_id);
+                    if (isset($sub_category) && !empty($sub_category)) {
+                        $sub_category->status = 'Active';
+                        $sub_category->inactive_by = null;
+                        $sub_category->inactive_reason = null;
+                        $sub_category->inactive_date = null;
+                        $sub_category->save();
+                    }
+                }
+            }
+            if (isset($request->vendor_id) && !empty($request->vendor_id)) {
+                foreach ($request->vendor_id as $key => $vendor_id) {
+                    $vendor = Vendor::withTrashed()->find($vendor_id);
+                    if (isset($vendor) && !empty($vendor)) {
+                        $vendor->status = 'Active';
+                        $vendor->inactive_by = null;
+                        $vendor->inactive_reason = null;
+                        $vendor->inactive_date = null;
+                        $vendor->save();
+                    }
+                }
+            }
+            if (isset($request->procedure_id) && !empty($request->procedure_id)) {
+                foreach ($request->procedure_id as $key => $procedure_id) {
+                    $procedure = Procedure::withTrashed()->find($procedure_id);
+                    if (isset($procedure) && !empty($procedure)) {
+                        $procedure->status = 'Active';
+                        $procedure->save();
+                    }
+                }
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Inactive data resorted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
 }

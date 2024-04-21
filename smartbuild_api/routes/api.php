@@ -89,6 +89,8 @@ Route::prefix('items')->group(function () {
     Route::any('/trashed_items', [ItemController::class, 'trashedItems']);
     Route::any('/restored_items', [ItemController::class, 'restoredItems']);
     Route::any('/items_category_search', [ItemController::class, 'itemsCategorySearch']);
+    Route::any('/inactive_items', [ItemController::class, 'inactiveItems']);
+    Route::any('/restored_inactive_items', [ItemController::class, 'restoredInactiveItems']);
 });
 
 Route::prefix('sizes')->group(function () {
