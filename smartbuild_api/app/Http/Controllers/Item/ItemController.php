@@ -227,6 +227,11 @@ class ItemController extends Controller
             }else{
                 $request['image_url'] = null;
             }
+            if ($request->item_status == '2') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $item = Item::create($request->all());
             if ($item) {
                 if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
@@ -317,6 +322,11 @@ class ItemController extends Controller
             }else{
                 $request['image_url'] = null;
             }
+            if ($request->item_status == '2') {
+                $request['inactive_date'] = Carbon::now()->format('Y-m-d');
+            }else{
+                $request['inactive_date'] = null;
+            }
             $item->update($request->all());
 
             if (isset($request->item_procedure_id) && $request->item_procedure_id != null) {
@@ -351,8 +361,10 @@ class ItemController extends Controller
 
             $items = Item::whereIn('id', $request->item_id)->get();
             foreach ($items as $item) {
-                $item->deletet_by = $request->deleted_by;
-                $item->delete();
+                $item->deleted_by = $request->deleted_by;
+                $item->deleted_reason = $request->deleted_reason;
+                $item->deleted_at = Carbon::now();
+                $item->save();
             }
             return response()->json(['status' => 'Success', 'message' => 'Item deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
@@ -776,6 +788,8 @@ class ItemController extends Controller
                     $item = Item::withTrashed()->find($item_id);
                     if (isset($item) && !empty($item)) {
                         $item->deleted_at = null;
+                        $item->deleted_by = null;
+                        $item->deleted_reason = null;
                         $item->save();
                     }
                 }
