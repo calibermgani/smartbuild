@@ -134,6 +134,8 @@ Route::prefix('procedures')->group(function () {
     Route::any('/index', [ProcedureController::class, 'index']);
     Route::any('/store', [ProcedureController::class, 'store']);
     Route::any('/item_procedures', [ProcedureController::class, 'itemProcedures']);
+    Route::any('/item_damaged', [ProcedureController::class, 'itemDamagedList']);
+    Route::any('/item_wasted', [ProcedureController::class, 'itemWastedList']);
 });
 
 
