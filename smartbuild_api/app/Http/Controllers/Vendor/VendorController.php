@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helper\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Vendor\Vendor;
 use Carbon\Carbon;
@@ -48,7 +49,14 @@ class VendorController extends Controller
                 $request['inactive_date'] = null;
             }
             $vendor = Vendor::create($request->all());
-
+            if (isset($vendor) && !empty($vendor)) {
+                $history['history_type'] = 'vendor';
+                $history['data_id'] = $vendor->id;
+                $history['action_by'] = 1;
+                $history['created_by'] = 1;
+                $history['action_type'] = 'create';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -87,6 +95,14 @@ class VendorController extends Controller
             }
             $vendor = Vendor::findOrFail($request->vendor_id);
             $vendor->update($request->all());
+            if (isset($vendor) && !empty($vendor)) {
+                $history['history_type'] = 'vendor';
+                $history['data_id'] = $vendor->id;
+                $history['action_by'] = 1;
+                $history['updated_by'] = 1;
+                $history['action_type'] = 'update';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -108,6 +124,13 @@ class VendorController extends Controller
                 $vendor->deleted_reason = $request->deleted_reason;
                 $vendor->deleted_at = Carbon::now();
                 $vendor->save();
+
+                $history['history_type'] = 'vendor';
+                $history['data_id'] = $vendor->id;
+                $history['action_by'] = 1;
+                $history['deleted_by'] = 1;
+                $history['action_type'] = 'delete';
+                Helpers::getHistoryData($history);
             }
             return response()->json(['status' => 'Success', 'message' => 'Vendors deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {

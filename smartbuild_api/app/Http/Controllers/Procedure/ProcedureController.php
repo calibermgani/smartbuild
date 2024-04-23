@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
+use App\Models\Item\ItemHistory;
 use App\Models\Procedure\ProcedureItemType;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
+use Illuminate\Support\Facades\Storage;
 
 class ProcedureController extends Controller
 {
@@ -154,6 +156,45 @@ class ProcedureController extends Controller
             }
 
 
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function itemHistory(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data['item'] = ItemHistory::with([
+                'item_history',
+                'item_history.item_category',
+                'item_history.item_sub_category',
+                'item_history.item_vendor',
+                'item_history.item_procedures',
+                ])
+                ->where('history_type_id', '1')
+                ->get();
+            $itemsWithImageUrl = $data['item']->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
+            $data['category'] = ItemHistory::with(['category_history', 'category_history.sub_category'])->where('history_type_id', '2')->get();
+            $data['sub_category'] = ItemHistory::with(['sub_category_history', 'sub_category_history.category'])->where('history_type_id', '3')->get();
+            $data['vendor'] = ItemHistory::with(['vendor_history'])->where('history_type_id', '4')->get();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Damaged Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'procedures' => $data]);
+            }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }

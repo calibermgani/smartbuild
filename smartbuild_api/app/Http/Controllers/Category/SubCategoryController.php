@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Category;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helper\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Category\SubCategory;
 use Carbon\Carbon;
@@ -63,6 +64,14 @@ class SubCategoryController extends Controller
                 $request['inactive_date'] = null;
             }
             $subCategory = SubCategory::create($request->all());
+            if (isset($subCategory) && !empty($subCategory)) {
+                $history['history_type'] = 'sub_category';
+                $history['data_id'] = $subCategory->id;
+                $history['action_by'] = 1;
+                $history['created_by'] = 1;
+                $history['action_type'] = 'create';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -108,7 +117,7 @@ class SubCategoryController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = $request->validate(SubCategory::rules($request->sub_category_id, $request->category_id));
-            
+
             if ($request->status == 'Inactive') {
                 $request['inactive_date'] = Carbon::now()->format('Y-m-d');
             }else{
@@ -116,6 +125,14 @@ class SubCategoryController extends Controller
             }
             $subCategory = SubCategory::findOrFail($request->sub_category_id);
             $subCategory->update($request->all());
+            if (isset($subCategory) && !empty($subCategory)) {
+                $history['history_type'] = 'sub_category';
+                $history['data_id'] = $subCategory->id;
+                $history['action_by'] = 1;
+                $history['updated_by'] = 1;
+                $history['action_type'] = 'update';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category updated successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -140,6 +157,13 @@ class SubCategoryController extends Controller
                 $subCategory->deleted_reason = $request->deleted_reason;
                 $subCategory->deleted_at = Carbon::now();
                 $subCategory->save();
+
+                $history['history_type'] = 'sub_category';
+                $history['data_id'] = $subCategory->id;
+                $history['action_by'] = 1;
+                $history['deleted_by'] = 1;
+                $history['action_type'] = 'delete';
+                Helpers::getHistoryData($history);
             }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {

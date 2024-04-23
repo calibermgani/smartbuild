@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Category;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helper\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
@@ -64,6 +65,14 @@ class CategoryController extends Controller
                 $request['inactive_date'] = null;
             }
             $category = Category::create($request->all());
+            if (isset($category) && !empty($category)) {
+                $history['history_type'] = 'category';
+                $history['data_id'] = $category->id;
+                $history['action_by'] = 1;
+                $history['created_by'] = 1;
+                $history['action_type'] = 'create';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Category created successfully', 'code' => 200, 'data' => $category]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -102,6 +111,14 @@ class CategoryController extends Controller
             }
             $category = Category::findOrFail($request->category_id);
             $category->update($request->all());
+            if (isset($category) && !empty($category)) {
+                $history['history_type'] = 'category';
+                $history['data_id'] = $category->id;
+                $history['action_by'] = 1;
+                $history['updated_by'] = 1;
+                $history['action_type'] = 'update';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Category updated successfully', 'code' => 200, 'data' => $category]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -123,6 +140,13 @@ class CategoryController extends Controller
                 $category->deleted_reason = $request->deleted_reason;
                 $category->deleted_at = Carbon::now();
                 $category->save();
+
+                $history['history_type'] = 'category';
+                $history['data_id'] = $category->id;
+                $history['action_by'] = 1;
+                $history['deleted_by'] = 1;
+                $history['action_type'] = 'delete';
+                Helpers::getHistoryData($history);
             }
             return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {

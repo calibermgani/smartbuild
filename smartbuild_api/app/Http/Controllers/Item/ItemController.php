@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helper\Helpers;
 use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
 use App\Models\Item\ItemSetAlertNotification;
@@ -244,6 +245,14 @@ class ItemController extends Controller
                     }
                 }
             }
+            if (isset($item) && !empty($item)) {
+                $history['history_type'] = 'item';
+                $history['data_id'] = $item->id;
+                $history['action_by'] = 1;
+                $history['created_by'] = 1;
+                $history['action_type'] = 'create';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Item created successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -341,6 +350,14 @@ class ItemController extends Controller
             }else{
                 ItemProcedure::where('item_id', $item->id)->delete();
             }
+            if (isset($item) && !empty($item)) {
+                $history['history_type'] = 'item';
+                $history['data_id'] = $item->id;
+                $history['action_by'] = 1;
+                $history['updated_by'] = 1;
+                $history['action_type'] = 'update';
+                Helpers::getHistoryData($history);
+            }
             return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
@@ -365,6 +382,13 @@ class ItemController extends Controller
                 $item->deleted_reason = $request->deleted_reason;
                 $item->deleted_at = Carbon::now();
                 $item->save();
+
+                $history['history_type'] = 'item';
+                $history['data_id'] = $item->id;
+                $history['action_by'] = 1;
+                $history['deleted_by'] = 1;
+                $history['action_type'] = 'delete';
+                Helpers::getHistoryData($history);
             }
             return response()->json(['status' => 'Success', 'message' => 'Item deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
