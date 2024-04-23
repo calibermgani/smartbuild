@@ -529,6 +529,14 @@ class ItemController extends Controller
                             }
                         }
                     }
+                    if (isset($clone) && !empty($clone)) {
+                        $history['history_type'] = 'item';
+                        $history['data_id'] = $clone->id;
+                        $history['action_by'] = 1;
+                        $history['updated_by'] = 1;
+                        $history['action_type'] = 'clone';
+                        Helpers::getHistoryData($history);
+                    }
                 }
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
