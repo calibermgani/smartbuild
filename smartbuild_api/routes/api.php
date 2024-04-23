@@ -91,6 +91,7 @@ Route::prefix('items')->group(function () {
     Route::any('/items_category_search', [ItemController::class, 'itemsCategorySearch']);
     Route::any('/inactive_items', [ItemController::class, 'inactiveItems']);
     Route::any('/restored_inactive_items', [ItemController::class, 'restoredInactiveItems']);
+    Route::any('/item_low_stock', [ItemController::class, 'itemLowStock']);
 });
 
 Route::prefix('sizes')->group(function () {

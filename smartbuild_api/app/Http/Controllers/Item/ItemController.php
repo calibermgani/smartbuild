@@ -993,4 +993,23 @@ class ItemController extends Controller
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
     }
+
+    public function itemLowStock(Request $request)
+    {
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $item_low_stock = Item::with(['item_vendor'])
+                ->whereRaw('COALESCE(store_qty, 0) <= 50')
+                ->get()->toArray();
+
+            return response()->json(['status' => 'Success', 'message' => 'Item low stock data retrieved successfully', 'code' => 200, 'total' => count($item_low_stock), 'data' => $item_low_stock]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
