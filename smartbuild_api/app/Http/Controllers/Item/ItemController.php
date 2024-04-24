@@ -316,19 +316,29 @@ class ItemController extends Controller
                 $request['item_procedure_id'] = null;
             }
             $item = Item::findOrFail($request->item_id);
-            if ($request->hasFile('item_image')) {
-                $filenameWithExt = $request->file('item_image')->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request->file('item_image')->getClientOriginalExtension();
-                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-                if (!Storage::exists('public/item_images/' . $item['spid'])) {
-                    $storage_path = Storage::makeDirectory('public/item_images/' . $item['spid'], 0775, true);
-                    $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
-                } else {
-                    $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
+            if (isset($request->item_image) && !empty($request->item_image)) {
+                $requestedImageUrl = $request->item_image;
+                $requestedImageName = pathinfo($request->item_image, PATHINFO_BASENAME);
+                if ($requestedImageName === $item->image_url) {
+                    $request['image_url'] = $requestedImageName;
+                }else{
+                    if ($request->hasFile('item_image')) {
+                        $filenameWithExt = $request->file('item_image')->getClientOriginalName();
+                        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                        $extension = $request->file('item_image')->getClientOriginalExtension();
+                        $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                        if (!Storage::exists('public/item_images/' . $item['spid'])) {
+                            $storage_path = Storage::makeDirectory('public/item_images/' . $item['spid'], 0775, true);
+                            $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
+                        } else {
+                            $path = $request->file('item_image')->storeAs('public/item_images/' . $item['spid'], $fileNameToStore);
+                        }
+                        $request['image_url'] = $fileNameToStore;
+                    }else{
+                        $request['image_url'] = null;
+                    }
                 }
-                $request['image_url'] = $fileNameToStore;
-            }else{
+            } else {
                 $request['image_url'] = null;
             }
             if ($request->item_status == '2') {
@@ -691,15 +701,39 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $item_recall = Item::select([
-                'id as id',
-                'item_number as item_number',
-                'item_name as item_name',
-                'lot_no as lot_no',
-                DB::raw('COALESCE(store_qty, 0) as store_qty'),
-                ])
-                ->where('tag', 'like', '%Recall%')
-                ->get()->toArray();
+            $item_recall = Item::with(['item_category' ,'item_sub_category','item_vendor', 'item_procedures'])->where('tag', 'like', '%Recall%')->get();
+            $itemsStatus = $item_recall->map(function ($item) {
+                if(isset($item->item_status) && !empty($item->item_status)) {
+                    if ($item->item_status == 1) {
+                        $status = 'Active';
+                    } else {
+                        $status = 'Inactive';
+                    }
+                    $item->setAttribute('item_status', $status);
+                    return $item;
+                }
+            });
+            $itemsProcedures = $item_recall->map(function ($item) {
+                if(isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                    $data = explode(',', $item->item_procedure_id);
+                    $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
+                        ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
+                        ->whereIn('item_procedures.procedure_id', $data)
+                        ->groupBy('item_procedures.item_id')
+                        ->first();
+                    $item->setAttribute('item_procedure_id', $procedures->procedure_names);
+                    return $item;
+                }
+            });
+            $itemsWithImageUrl = $item_recall->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
 
             return response()->json(['status' => 'Success', 'message' => 'Item recall successfully', 'code' => 200, 'total' => count($item_recall), 'data' => $item_recall]);
         } catch (\Exception $e) {
@@ -759,6 +793,29 @@ class ItemController extends Controller
                     }
                 })
                 ->get();
+            $itemsStatus = $nearExpiredItems->map(function ($item) {
+                if(isset($item->item_status) && !empty($item->item_status)) {
+                    if ($item->item_status == 1) {
+                        $status = 'Active';
+                    } else {
+                        $status = 'Inactive';
+                    }
+                    $item->setAttribute('item_status', $status);
+                    return $item;
+                }
+            });
+            $itemsProcedures = $nearExpiredItems->map(function ($item) {
+                if(isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                    $data = explode(',', $item->item_procedure_id);
+                    $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
+                        ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
+                        ->whereIn('item_procedures.procedure_id', $data)
+                        ->groupBy('item_procedures.item_id')
+                        ->first();
+                    $item->setAttribute('item_procedure_id', $procedures->procedure_names);
+                    return $item;
+                }
+            });
             $itemsWithImageUrl = $nearExpiredItems->map(function ($item) {
                 if ($item->image_url) {
                     $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
@@ -1034,9 +1091,41 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $item_low_stock = Item::with(['item_vendor'])
+            $item_low_stock = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
                 ->whereRaw('COALESCE(store_qty, 0) <= 50')
-                ->get()->toArray();
+                ->get();
+            $itemsStatus = $item_low_stock->map(function ($item) {
+                if(isset($item->item_status) && !empty($item->item_status)) {
+                    if ($item->item_status == 1) {
+                        $status = 'Active';
+                    } else {
+                        $status = 'Inactive';
+                    }
+                    $item->setAttribute('item_status', $status);
+                    return $item;
+                }
+            });
+            $itemsProcedures = $item_low_stock->map(function ($item) {
+                if(isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                    $data = explode(',', $item->item_procedure_id);
+                    $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
+                        ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
+                        ->whereIn('item_procedures.procedure_id', $data)
+                        ->groupBy('item_procedures.item_id')
+                        ->first();
+                    $item->setAttribute('item_procedure_id', $procedures->procedure_names);
+                    return $item;
+                }
+            });
+            $itemsWithImageUrl = $item_low_stock->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
 
             return response()->json(['status' => 'Success', 'message' => 'Item low stock data retrieved successfully', 'code' => 200, 'total' => count($item_low_stock), 'data' => $item_low_stock]);
         } catch (\Exception $e) {
