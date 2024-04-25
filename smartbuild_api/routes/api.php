@@ -92,6 +92,7 @@ Route::prefix('items')->group(function () {
     Route::any('/inactive_items', [ItemController::class, 'inactiveItems']);
     Route::any('/restored_inactive_items', [ItemController::class, 'restoredInactiveItems']);
     Route::any('/item_low_stock', [ItemController::class, 'itemLowStock']);
+    Route::any('/item_history_details', [ItemController::class, 'itemHistoryDetails']);
 });
 
 Route::prefix('sizes')->group(function () {

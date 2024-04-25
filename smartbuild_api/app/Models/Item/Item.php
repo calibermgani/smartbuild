@@ -101,4 +101,9 @@ class Item extends Model
     {
         return $this->hasMany(Item::class, 'item_clone_id')->with(['item_category','item_sub_category','item_vendor','item_procedures']);
     }
+
+    public function item_histories(): HasMany
+    {
+        return $this->hasMany(ItemHistory::class, 'data_id', 'id');
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Helper\Helpers;
 use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
+use App\Models\Item\ItemHistory;
 use App\Models\Item\ItemSetAlertNotification;
 use App\Models\Procedure\Procedure;
 use App\Models\Vendor\Vendor;
@@ -171,7 +172,8 @@ class ItemController extends Controller
                     });
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
             } catch (\Exception $e) {
-                return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+                log::debug($e->getMessage());
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
             }
         }
     }
@@ -255,7 +257,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Item created successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -280,7 +283,8 @@ class ItemController extends Controller
             $item->setAttribute('image_url', $imageUrl);
             return response()->json(['status' => 'Success', 'message' => 'Item retrieved successfully', 'code' => 200 , 'data' => $item]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -373,7 +377,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Item updated successfully', 'code' => 200, 'data' => $item]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -405,7 +410,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Item deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -556,7 +562,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Item cloned successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
     public function itemMove(Request $request)
@@ -741,7 +748,7 @@ class ItemController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Item recall successfully', 'code' => 200, 'total' => count($item_recall), 'data' => $item_recall]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -765,7 +772,7 @@ class ItemController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($item_refill_to_cabinet), 'data' => $item_refill_to_cabinet]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
     public function nearExpiredItems(Request $request)
@@ -831,7 +838,7 @@ class ItemController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Near expiry items successfully retrieved', 'code' => 200, 'total' => count($nearExpiredItems), 'data' => $nearExpiredItems]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -864,7 +871,8 @@ class ItemController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Trash data retrieved successfully', 'code' => 200, 'data' => $data]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -930,7 +938,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Data resorted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -967,7 +976,8 @@ class ItemController extends Controller
                 });
             return response()->json(['status' => 'Success', 'message' => 'Category item retrieved successfully', 'code' => 200 , 'total_couunt' => count($data), 'items' => $data]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -1012,7 +1022,8 @@ class ItemController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Inactive data retrieved successfully', 'code' => 200, 'data' => $data]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -1082,7 +1093,8 @@ class ItemController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Inactive data resorted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -1133,7 +1145,33 @@ class ItemController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Item low stock data retrieved successfully', 'code' => 200, 'total' => count($item_low_stock), 'data' => $item_low_stock]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function itemHistoryDetails(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $itemHistory = Item::with([
+                'item_histories'
+                ])
+                ->where('id', $request->item_id)
+                ->first();
+            if (isset($itemHistory->image_url) && !empty($itemHistory->image_url)) {
+                $imageUrl = Storage::url('item_images/'.$itemHistory->spid.'/'.$itemHistory->image_url);
+            } else {
+                $imageUrl = null;
+            }
+            $itemHistory->setAttribute('image_url', $imageUrl);
+
+            return response()->json(['status' => 'Success', 'message' => 'Item low stock data retrieved successfully', 'code' => 200, 'data' => $itemHistory]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }
