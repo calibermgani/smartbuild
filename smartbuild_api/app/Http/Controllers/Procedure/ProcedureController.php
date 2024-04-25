@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
 use App\Models\Item\ItemHistory;
+use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\ProcedureItemType;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProcedureController extends Controller
 {
@@ -131,7 +133,7 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Damaged Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'procedures' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Damaged Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'item_damaged_list' => $data]);
             }
 
 
@@ -152,7 +154,7 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Damaged Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'procedures' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Damaged Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'item_wasted_list' => $data]);
             }
 
 
@@ -193,8 +195,79 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Item history retrieved successfully', 'code' => 200, 'procedures' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Item history retrieved successfully', 'code' => 200, 'item_history' => $data]);
             }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function procedureList(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = PatientsInformation::get();
+            $patientName = $data->map(function ($patient) {
+                $name = $patient->first_name . ' ' . $patient->middle_name;
+                $patient->setAttribute('patient_name', $name);
+                return $patient;
+            });
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Procedure List data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient_list' => $data]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function procedureDetails(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name) as patient_name'))->where('id', $request->patient_id)->first();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'patient' => $data]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function procedureImport(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if ($request->attachment != '') {
+                // $attachmentName = $request->attachment->getClientOriginalName();
+                // $extension6 = $request->attachment->getClientOriginalExtension();
+                // $onlyFileName = pathinfo($attachmentName, PATHINFO_FILENAME);
+                // $onlyFileName = str_replace(' ', '_', $onlyFileName);
+                // $fileNames = $onlyFileName . '_' . date('YmdHis') . '.' . $extension6;
+
+                // if (!Storage::exists('public/importFiles/')) {
+                //     $storage_path = Storage::makeDirectory('importFiles/', 0775, true);
+                //     $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+                // } else {
+                //     $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+                // }
+
+                // $import_data = new ImportNewClaims($modify_filename, $report_date, $notes, $user, $fileNameToStore, $practice_dbid);
+            }
+
+            return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient' => $data]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
         }
