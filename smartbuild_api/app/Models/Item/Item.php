@@ -60,7 +60,7 @@ class Item extends Model
         return [
             'item_number' => [
                 'required',
-                Rule::unique('items', 'item_number')->whereNull('deleted_at')->whereNull('item_clone_id')->ignore($id),
+                Rule::unique('items', 'item_number')->whereNull('deleted_at')->ignore($id),
             ],
             'item_name' => [
                 'required',

@@ -142,6 +142,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/procedure_list', [ProcedureController::class, 'procedureList']);
     Route::any('/procedure_details', [ProcedureController::class, 'procedureDetails']);
     Route::any('/procedure_import', [ProcedureController::class, 'procedureImport']);
+    Route::any('/material_my_cart', [ProcedureController::class, 'materialMyCart']);
 });
 
 
