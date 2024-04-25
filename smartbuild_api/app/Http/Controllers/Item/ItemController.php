@@ -197,7 +197,11 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Item::rules());
+            $validator = validator()->make($request->all(), Item::rules());
+
+            if ($validator->fails()) {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $validator->errors()], 500);
+            }
             if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
@@ -310,7 +314,11 @@ class ItemController extends Controller
             if (empty($request->item_category_id) || $request->item_category_id == null) {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => 'The item category is inactive. Please activate it and update the item.'], 500);
             }
-            $data = $request->validate(Item::rules($request->item_id));
+            $validator = validator()->make($request->all(), Item::rules($request->item_id));
+
+            if ($validator->fails()) {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $validator->errors()], 500);
+            }
             if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
             } else {
