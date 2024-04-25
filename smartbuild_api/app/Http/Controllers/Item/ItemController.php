@@ -200,7 +200,9 @@ class ItemController extends Controller
             $validator = validator()->make($request->all(), Item::rules());
 
             if ($validator->fails()) {
-                return response()->json(['status' => 'error', 'code' => 500, 'message' => $validator->errors()], 500);
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
             }
             if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);
@@ -317,7 +319,9 @@ class ItemController extends Controller
             $validator = validator()->make($request->all(), Item::rules($request->item_id));
 
             if ($validator->fails()) {
-                return response()->json(['status' => 'error', 'code' => 500, 'message' => $validator->errors()], 500);
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
             }
             if (isset($request->tag) && $request->tag != null) {
                 $request['tag'] = implode(',', $request->tag);

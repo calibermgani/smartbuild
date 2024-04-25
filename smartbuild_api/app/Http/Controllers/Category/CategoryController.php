@@ -58,7 +58,13 @@ class CategoryController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Category::rules());
+            $validator = validator()->make($request->all(), Category::rules());
+
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
+            }
             if ($request->status == 'Inactive') {
                 $request['inactive_date'] = Carbon::now()->format('Y-m-d');
             }else{
