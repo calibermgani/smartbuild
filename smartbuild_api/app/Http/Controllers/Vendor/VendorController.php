@@ -44,7 +44,12 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Vendor::rules());
+            $validator = validator()->make($request->all(), Vendor::rules());
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
+            }
             if ($request->status == 'Inactive') {
                 $request['inactive_date'] = Carbon::now()->format('Y-m-d');
             }else{
@@ -91,7 +96,12 @@ class VendorController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Vendor::rules($request->vendor_id));
+            $validator = validator()->make($request->all(), Vendor::rules($request->vendor_id));
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
+            }
             if ($request->status == 'Inactive') {
                 $request['inactive_date'] = Carbon::now()->format('Y-m-d');
             }else{
