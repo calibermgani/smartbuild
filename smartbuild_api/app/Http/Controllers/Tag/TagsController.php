@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tag;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tag\Tag;
+use Illuminate\Support\Facades\Log;
 
 class TagsController extends Controller
 {
@@ -99,7 +100,8 @@ class TagsController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

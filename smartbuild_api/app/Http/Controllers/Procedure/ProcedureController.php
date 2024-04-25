@@ -8,6 +8,7 @@ use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\ProcedureItemType;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +37,8 @@ class ProcedureController extends Controller
                 $procedures = Procedure::get();
                 return response()->json(['status' => 'Success', 'message' => 'Procedure retrieved successfully', 'code'=>200, 'data' => $procedures], 200);
             } catch (\Exception $e) {
-                return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+                Log::debug($e->getMessage());
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
             }
         }
     }
@@ -64,7 +66,8 @@ class ProcedureController extends Controller
             $procedures = Procedure::create($request->all());
             return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $procedures]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -117,7 +120,8 @@ class ProcedureController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -138,7 +142,8 @@ class ProcedureController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -159,7 +164,8 @@ class ProcedureController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -198,7 +204,8 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Item history retrieved successfully', 'code' => 200, 'item_history' => $data]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -222,7 +229,8 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Procedure List data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient_list' => $data]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -239,7 +247,8 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'patient' => $data]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -267,9 +276,10 @@ class ProcedureController extends Controller
                 // $import_data = new ImportNewClaims($modify_filename, $report_date, $notes, $user, $fileNameToStore, $practice_dbid);
             }
 
-            return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient' => $data]);
+            // return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient' => $data]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

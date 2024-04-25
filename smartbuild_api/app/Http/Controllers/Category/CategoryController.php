@@ -9,6 +9,7 @@ use App\Models\Category\Category;
 use App\Models\Category\SubCategory;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -46,7 +47,8 @@ class CategoryController extends Controller
                 ->get();
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code'=>200, 'total_count' => count($categories), 'data' => $categories], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -81,7 +83,8 @@ class CategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Category created successfully', 'code' => 200, 'data' => $category]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -97,7 +100,8 @@ class CategoryController extends Controller
             $category = Category::with(['sub_category'])->findOrFail($request->category_id);
             return response()->json(['status' => 'Success', 'message' => 'Category retrieved successfully', 'code' => 200 , 'data' => $category]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -109,7 +113,12 @@ class CategoryController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data = $request->validate(Category::rules($request->category_id));
+            $validator = validator()->make($request->all(), Category::rules($request->category_id));
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $errorMessage = implode(' ', $errors);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $errorMessage], 500);
+            }
             if ($request->status == 'Inactive') {
                 $request['inactive_date'] = Carbon::now()->format('Y-m-d');
             }else{
@@ -127,7 +136,8 @@ class CategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Category updated successfully', 'code' => 200, 'data' => $category]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -156,7 +166,8 @@ class CategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -178,7 +189,8 @@ class CategoryController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -201,7 +213,8 @@ class CategoryController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

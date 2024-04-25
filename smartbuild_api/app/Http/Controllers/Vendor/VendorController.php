@@ -7,6 +7,7 @@ use App\Http\Helper\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Vendor\Vendor;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class VendorController extends Controller
 {
@@ -29,7 +30,8 @@ class VendorController extends Controller
             $vendors = Vendor::orderBy('id', 'desc')->get();
             return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200, 'data' => $vendors], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -59,7 +61,8 @@ class VendorController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Vendor created successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -75,7 +78,8 @@ class VendorController extends Controller
             $vendor = Vendor::findOrFail($request->vendor_id);
             return response()->json(['status' => 'Success', 'message' => 'Vendor retrieved successfully', 'code' => 200 , 'data' => $vendor]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -105,7 +109,8 @@ class VendorController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Vendors updated successfully', 'code' => 200, 'data' => $vendor]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -134,7 +139,8 @@ class VendorController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Vendors deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
     public function itemVendor(Request $request)
@@ -155,7 +161,8 @@ class VendorController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

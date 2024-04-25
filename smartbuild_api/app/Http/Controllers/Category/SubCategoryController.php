@@ -7,6 +7,7 @@ use App\Http\Helper\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Category\SubCategory;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SubCategoryController extends Controller
 {
@@ -74,7 +75,8 @@ class SubCategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category created successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -93,7 +95,8 @@ class SubCategoryController extends Controller
             $subCategory = SubCategory::with(['category'])->findOrFail($request->sub_category_id);
             return response()->json(['status' => 'Success', 'message' => 'Sub Category retrieved successfully', 'code' => 200 , 'data' => $subCategory]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 404, 'message' => $e->getMessage()], 404);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -135,7 +138,8 @@ class SubCategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category updated successfully', 'code' => 200, 'data' => $subCategory]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -167,7 +171,8 @@ class SubCategoryController extends Controller
             }
             return response()->json(['status' => 'Success', 'message' => 'Sub Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }
