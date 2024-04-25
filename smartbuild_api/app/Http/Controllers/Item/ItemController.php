@@ -86,22 +86,26 @@ class ItemController extends Controller
                             $query;
                         }
                         if (!empty($min_cabinet_qty) && !empty($max_cabinet_qty)) {
-                            $query->whereBetween('cabinet_qty', [$min_cabinet_qty, $max_cabinet_qty]);
+                            $query->where('cabinet_qty', '>=', $min_cabinet_qty)
+                                ->where('cabinet_qty', '<=', $max_cabinet_qty);
                         } else {
                             $query;
                         }
                         if (!empty($min_store_qty) && !empty($max_store_qty)) {
-                            $query->whereBetween('store_qty', [$min_store_qty, $max_store_qty]);
+                            $query->where('store_qty', '>=', $min_store_qty)
+                                ->where('store_qty', '<=', $max_store_qty);
                         } else {
                             $query;
                         }
                         if (!empty($min_price) && !empty($max_price)) {
-                            $query->whereBetween('price', [$min_price, $max_price]);
+                            $query->where('price', '>=', $min_price)
+                                ->where('price', '<=', $max_price);
                         } else {
                             $query;
                         }
                         if (!empty($min_min_level) && !empty($max_min_level)) {
-                            $query->whereBetween('min_level', [$min_min_level, $max_min_level]);
+                            $query->where('min_level', '>=', $min_min_level)
+                                ->where('min_level', '<=', $max_min_level);
                         } else {
                             $query;
                         }
@@ -120,8 +124,8 @@ class ItemController extends Controller
                         } else {
                             $query;
                         }
-                        if (isset($request->item_barcode) && !empty($request->item_barcode)) {
-                            $query->where('index_barcode','like', '%' . $request->item_barcode . '%');
+                        if (isset($request->index_barcode) && !empty($request->index_barcode)) {
+                            $query->where('item_barcode','like', '%' . $request->index_barcode . '%');
                         } else {
                             $query;
                         }
