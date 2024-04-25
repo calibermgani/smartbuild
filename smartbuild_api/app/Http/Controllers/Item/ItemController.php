@@ -772,14 +772,41 @@ class ItemController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $item_refill_to_cabinet = Item::select([
-                'id as id',
-                'item_number as item_number',
-                'item_name as item_name',
-                DB::raw('COALESCE(cabinet_qty, 0) as cabinet_total_qty'),
-                ])
+            $item_refill_to_cabinet = Item::with(['item_category' ,'item_sub_category','item_vendor', 'item_procedures'])
                 ->whereRaw('COALESCE(cabinet_qty, 0) <= 50')
-                ->get()->toArray();
+                ->get();
+            $itemsStatus = $item_refill_to_cabinet->map(function ($item) {
+                if(isset($item->item_status) && !empty($item->item_status)) {
+                    if ($item->item_status == 1) {
+                        $status = 'Active';
+                    } else {
+                        $status = 'Inactive';
+                    }
+                    $item->setAttribute('item_status', $status);
+                    return $item;
+                }
+            });
+            $itemsProcedures = $item_refill_to_cabinet->map(function ($item) {
+                if(isset($item->item_procedure_id) && !empty($item->item_procedure_id)) {
+                    $data = explode(',', $item->item_procedure_id);
+                    $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
+                        ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
+                        ->whereIn('item_procedures.procedure_id', $data)
+                        ->groupBy('item_procedures.item_id')
+                        ->first();
+                    $item->setAttribute('item_procedure_id', $procedures->procedure_names);
+                    return $item;
+                }
+            });
+            $itemsWithImageUrl = $item_refill_to_cabinet->map(function ($item) {
+                if ($item->image_url) {
+                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                } else {
+                    $imageUrl = null;
+                }
+                $item->setAttribute('image_url', $imageUrl);
+                return $item;
+            });
 
             return response()->json(['status' => 'Success', 'message' => 'Item refill quantity for cabinet successfully retrieved', 'code' => 200, 'total' => count($item_refill_to_cabinet), 'data' => $item_refill_to_cabinet]);
         } catch (\Exception $e) {
