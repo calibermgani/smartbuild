@@ -242,6 +242,11 @@ class ProcedureController extends Controller
                 'height as Height',
                 'procedure as Procedure Name',
             ])->get();
+
+            $checkBox = $data->map(function ($data) {
+                $data->setAttribute('checkboxSelection', true);
+                return $data;
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
