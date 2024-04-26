@@ -291,16 +291,11 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = PatientsInformation::get();
-            $patientName = $data->map(function ($patient) {
-                $name = $patient->first_name . ' ' . $patient->middle_name;
-                $patient->setAttribute('patient_name', $name);
-                return $patient;
-            });
-            if (empty($data)) {
+            $procedure = Procedure::with(['procedure_item', 'procedure_item.item_details'])->where('procedure_name', 'like', '%' . $request->procedure . '%')->first();
+            if (empty($procedure)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure List data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient_list' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_list' => $procedure]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
