@@ -220,6 +220,7 @@ class ProcedureController extends Controller
             }
 
             $data = PatientsInformation::select([
+                DB::raw("true as checkboxSelection"),
                 'id as id',
                 DB::raw("CONCAT(first_name, ' ', middle_name) as 'Name'"),
                 'mrn_no as MRN',
