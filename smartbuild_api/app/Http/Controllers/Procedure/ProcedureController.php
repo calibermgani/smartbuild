@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Procedure;
 use App\Http\Controllers\Controller;
 use App\Models\Item\ItemHistory;
 use App\Models\Procedure\PatientsInformation;
+use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
@@ -313,6 +314,26 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_list' => $procedure]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientRequest(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $patientRequest = PatientsRequest::create($request->all());
+            if (empty($patientRequest)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_request' => $patientRequest]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
