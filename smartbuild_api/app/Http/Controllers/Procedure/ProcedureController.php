@@ -217,12 +217,29 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = PatientsInformation::get();
-            $patientName = $data->map(function ($patient) {
-                $name = $patient->first_name . ' ' . $patient->middle_name;
-                $patient->setAttribute('patient_name', $name);
-                return $patient;
-            });
+            $data = PatientsInformation::select([
+                'id as id',
+                DB::raw("CONCAT(first_name, ' ', middle_name) as 'Name'"),
+                'mrn_no as MRN',
+                'gender as Gender',
+                'patient_type as Type',
+                'dob as DOB',
+                'age as Age',
+                'location as Location',
+                'exam_status as Exam Status',
+                'study_id as Study ID',
+                'priority as Priority',
+                'procedure_status as Procedure Status',
+                'study_date_time as Study Date And Time',
+                'accession_no as Accession Number',
+                'requesting_physician as Requesting Physician',
+                'specialty as Speciality',
+                'language as Language',
+                'blood_group as Blood',
+                'weight as Weight',
+                'height as Height',
+                'procedure as Procedure Name',
+            ])->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
