@@ -163,6 +163,23 @@ class CategoryController extends Controller
                 $history['deleted_by'] = 1;
                 $history['action_type'] = 'delete';
                 Helpers::getHistoryData($history);
+                if (isset($category) && !empty($category)) {
+                    $sub_categories = SubCategory::where('category_id', $category->id)->get();
+                    if (isset($sub_categories) && !empty($sub_categories)) {
+                        foreach ($sub_categories as $key => $sub_category) {
+                            $sub_category->deleted_by = $request->deleted_by;
+                            $sub_category->deleted_reason = $request->deleted_reason;
+                            $sub_category->deleted_at = Carbon::now();
+                            $sub_category->save();
+
+                            $history['history_type'] = 'sub_category';
+                            $history['data_id'] = $sub_category->id;
+                            $history['action_by'] = 1;
+                            $history['deleted_by'] = 1;
+                            $history['action_type'] = 'delete';
+                        }
+                    }
+                }
             }
             return response()->json(['status' => 'Success', 'message' => 'Category deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
