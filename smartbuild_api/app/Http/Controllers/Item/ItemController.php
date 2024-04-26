@@ -120,8 +120,8 @@ class ItemController extends Controller
                         } else {
                             $query;
                         }
-                        if (isset($request->item_barcode) && !empty($request->item_barcode)) {
-                            $query->where('index_barcode','like', '%' . $request->item_barcode . '%');
+                        if (isset($request->index_barcode) && !empty($request->index_barcode)) {
+                            $query->where('item_barcode','like', '%' . $request->index_barcode . '%');
                         } else {
                             $query;
                         }
