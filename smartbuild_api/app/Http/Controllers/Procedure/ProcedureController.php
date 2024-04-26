@@ -211,7 +211,7 @@ class ProcedureController extends Controller
         }
     }
 
-    public function procedureList(Request $request){
+    public function patientList(Request $request){
         try {
             $token = $request->token;
 
@@ -253,7 +253,7 @@ class ProcedureController extends Controller
         }
     }
 
-    public function procedureDetails(Request $request){
+    public function patientDetails(Request $request){
         try {
             $token = $request->token;
             if (!$this->user_authentication($token)) {
