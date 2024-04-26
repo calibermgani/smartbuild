@@ -7,6 +7,7 @@ use App\Models\Item\ItemHistory;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
+use App\Models\Procedure\VettingTypes;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
 use Illuminate\Support\Facades\Log;
@@ -334,6 +335,26 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_request' => $patientRequest]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function vettingTypes(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $types = VettingTypes::get();
+            if (empty($types)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'total_count' => count($types), 'vetting_types' => $types]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
