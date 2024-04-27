@@ -7,6 +7,7 @@ use App\Models\Item\ItemHistory;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
+use App\Models\Procedure\PatientRequestProtocolling;
 use App\Models\Procedure\PatientRequestVetting;
 use App\Models\Procedure\ProtocolType;
 use App\Models\Procedure\VettingTypes;
@@ -322,7 +323,7 @@ class ProcedureController extends Controller
             if (empty($procedure)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Matrial data retrieved successfully', 'code' => 200, 'patient_list' => $procedure]);
+                return response()->json(['status' => 'Success', 'message' => 'Matrial data retrieved successfully', 'code' => 200, 'my_cart' => $procedure]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -402,7 +403,27 @@ class ProcedureController extends Controller
             if (empty($types)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Protocol types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'vetting_types' => $types]);
+                return response()->json(['status' => 'Success', 'message' => 'Protocol types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'protocol_types' => $types]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function storeProtocolRequest(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = PatientRequestProtocolling::create($request->all());
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'protocol_request' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
