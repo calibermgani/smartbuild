@@ -8,6 +8,7 @@ use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
 use App\Models\Procedure\PatientRequestVetting;
+use App\Models\Procedure\ProtocolType;
 use App\Models\Procedure\VettingTypes;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
@@ -252,7 +253,7 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure List data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient_list' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Patient List data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient_list' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -321,7 +322,7 @@ class ProcedureController extends Controller
             if (empty($procedure)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_list' => $procedure]);
+                return response()->json(['status' => 'Success', 'message' => 'Matrial data retrieved successfully', 'code' => 200, 'patient_list' => $procedure]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -341,7 +342,7 @@ class ProcedureController extends Controller
             if (empty($patientRequest)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'patient_request' => $patientRequest]);
+                return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200, 'patient_request' => $patientRequest]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -361,7 +362,7 @@ class ProcedureController extends Controller
             if (empty($types)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'total_count' => count($types), 'vetting_types' => $types]);
+                return response()->json(['status' => 'Success', 'message' => 'Vetting types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'vetting_types' => $types]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -381,7 +382,27 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Procedure items retrieved successfully', 'code' => 200, 'vetting_request' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Vetting request created successfully', 'code' => 200, 'vetting_request' => $data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function protocolTypes(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $types = ProtocolType::get();
+            if (empty($types)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Protocol types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'vetting_types' => $types]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());

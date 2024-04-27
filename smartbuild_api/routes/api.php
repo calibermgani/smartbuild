@@ -146,6 +146,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/patient_request', [ProcedureController::class, 'patientRequest']);
     Route::any('/vetting_types', [ProcedureController::class, 'vettingTypes']);
     Route::any('/store_vetting_request', [ProcedureController::class, 'storeVettingRequest']);
+    Route::any('/protocol_types', [ProcedureController::class, 'protocolTypes']);
 });
 
 
