@@ -10,6 +10,8 @@ use App\Models\Procedure\ProcedureItemType;
 use App\Models\Procedure\PatientRequestProtocolling;
 use App\Models\Procedure\PatientRequestVetting;
 use App\Models\Procedure\ProtocolType;
+use App\Models\Procedure\ShoppingCart;
+use App\Models\Procedure\ShoppingTypes;
 use App\Models\Procedure\VettingTypes;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
@@ -424,6 +426,36 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'protocol_request' => $data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function storeShoppingCart(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->stage_type) && $request->stage_type != null) {
+                $stage_type = ShoppingTypes::where('name', $request->stage_type)->first();
+                $request['stage_type_id'] = $stage_type->id;
+            } else {
+                $request['stage_type_id'] = null;
+            }
+            if (isset($request->item_id) && $request->item_id != null) {
+                $request['item_id'] = implode(',', $request->item_id);
+            } else {
+                $request['item_id'] = null;
+            }
+            $data = ShoppingCart::create($request->all());
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'protocol_request' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
