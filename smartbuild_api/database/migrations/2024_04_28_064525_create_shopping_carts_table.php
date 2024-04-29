@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('mrn_number')->nullable();
             $table->string('item_id')->nullable();
             $table->unsignedBigInteger('patient_id')->nullable();
-            $table->integer('quantity')->nullable();
+            $table->string('quantity')->nullable();
             $table->integer('stage_type_id')->nullable();
             $table->date('purchased_date')->nullable();
             $table->integer('purchased_by')->nullable();
