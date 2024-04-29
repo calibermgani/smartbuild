@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
+use App\Imports\PatientDataImport;
 use App\Models\Item\ItemHistory;
+use App\Models\Procedure\AddYourProtocol;
 use App\Models\Procedure\CheckList;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
@@ -284,31 +286,30 @@ class ProcedureController extends Controller
         }
     }
 
-    public function procedureImport(Request $request){
+    public function patientImport(Request $request){
         try {
             $token = $request->token;
 
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            if ($request->attachment != '') {
-                // $attachmentName = $request->attachment->getClientOriginalName();
-                // $extension6 = $request->attachment->getClientOriginalExtension();
-                // $onlyFileName = pathinfo($attachmentName, PATHINFO_FILENAME);
-                // $onlyFileName = str_replace(' ', '_', $onlyFileName);
-                // $fileNames = $onlyFileName . '_' . date('YmdHis') . '.' . $extension6;
+            // if ($request->attachment != '') {
+            //     $attachmentName = $request->attachment->getClientOriginalName();
+            //     $extension = $request->attachment->getClientOriginalExtension();
+            //     $onlyFileName = pathinfo($attachmentName, PATHINFO_FILENAME);
+            //     $fileName = str_replace(' ', '_', $onlyFileName);
+            //     $fileNames = $fileName . '_' . date('YmdHis') . '.' . $extension;
 
-                // if (!Storage::exists('public/importFiles/')) {
-                //     $storage_path = Storage::makeDirectory('importFiles/', 0775, true);
-                //     $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
-                // } else {
-                //     $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
-                // }
+            //     if (!Storage::exists('public/importFiles')) {
+            //         $storage_path = Storage::makeDirectory('importFiles', 0775, true);
+            //         $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+            //     } else {
+            //         $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+            //     }
+            //     $import_data = new PatientDataImport($fileNames);
+            // }
 
-                // $import_data = new ImportNewClaims($modify_filename, $report_date, $notes, $user, $fileNameToStore, $practice_dbid);
-            }
-
-            // return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'total_count' => count($data), 'patient' => $data]);
+            return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
@@ -323,7 +324,12 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $procedure = Procedure::with(['procedure_item', 'procedure_item.item_details'])->where('procedure_name', 'like', '%' . $request->procedure . '%')->first();
+            $procedure = Procedure::with(['procedure_item', 'procedure_item.item_details'])
+                ->whereHas('procedure_item.item_details' , function ($query) {
+                    $query->where('status', 'Active');
+                })
+                ->where('procedure_name', 'like', '%' . $request->procedure . '%')
+                ->first();
             if (empty($procedure)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -488,6 +494,26 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'check_list' => $data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function addYourProtocol(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $types = AddYourProtocol::get();
+            if (empty($types)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Add Your Protocol types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'add_protocol_types' => $types]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());

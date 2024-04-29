@@ -141,7 +141,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/item_history', [ProcedureController::class, 'itemHistory']);
     Route::any('/patient_list', [ProcedureController::class, 'patientList']);
     Route::any('/patient_details', [ProcedureController::class, 'patientDetails']);
-    Route::any('/procedure_import', [ProcedureController::class, 'procedureImport']);
+    Route::any('/patient_import', [ProcedureController::class, 'patientImport']);
     Route::any('/material_my_cart', [ProcedureController::class, 'materialMyCart']);
     Route::any('/patient_request', [ProcedureController::class, 'patientRequest']);
     Route::any('/vetting_types', [ProcedureController::class, 'vettingTypes']);
@@ -150,6 +150,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/store_protocol_request', [ProcedureController::class, 'storeProtocolRequest']);
     Route::any('/store_shopping_cart', [ProcedureController::class, 'storeShoppingCart']);
     Route::any('/check_list_index', [ProcedureController::class, 'checkListIndex']);
+    Route::any('/add_your_protocol', [ProcedureController::class, 'addYourProtocol']);
 });
 
 
