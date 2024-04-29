@@ -388,12 +388,17 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
-            $data = PatientRequestVetting::create($request->all());
+            $vetting_request = PatientRequestVetting::where('patient_id', $request->patient_id)->first();
+            if (isset($vetting_request) && !empty($vetting_request)) {
+                $vetting_request->update($request->all());
+                $data = $vetting_request;
+            }else{
+                $data = PatientRequestVetting::create($request->all());
+            }
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Vetting request created successfully', 'code' => 200, 'vetting_request' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Vetting request created or updated successfully', 'code' => 200, 'vetting_request' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -429,11 +434,18 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = PatientRequestProtocolling::create($request->all());
+            $protocol_request = PatientRequestProtocolling::where('patient_id', $request->patient_id)->first();
+            if (isset($protocol_request) && !empty($protocol_request)) {
+                $protocol_request->update($request->all());
+                $data = $protocol_request;
+            } else {
+                $data = PatientRequestProtocolling::create($request->all());
+            }
+
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'protocol_request' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Protocol request created or updated successfully', 'code' => 200, 'protocol_request' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -515,6 +527,28 @@ class ProcedureController extends Controller
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Add Your Protocol types retrieved successfully', 'code' => 200, 'total_count' => count($types), 'add_protocol_types' => $types]);
             }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function vettingProtocolIndex(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->id) && isset($request->patient_id) && $request->id != null && $request->patient_id != null) {
+                if ($request->id == "2") {
+                    $data['vetting'] = PatientRequestVetting::where('patient_id', $request->patient_id)->first();
+                    $data['protocoling'] = PatientRequestProtocolling::where('patient_id', $request->patient_id)->first();
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200, 'data' => $data]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);

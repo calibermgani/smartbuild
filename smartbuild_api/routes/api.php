@@ -151,6 +151,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/store_shopping_cart', [ProcedureController::class, 'storeShoppingCart']);
     Route::any('/check_list_index', [ProcedureController::class, 'checkListIndex']);
     Route::any('/add_your_protocol', [ProcedureController::class, 'addYourProtocol']);
+    Route::any('/vetting_protocol_index', [ProcedureController::class, 'vettingProtocolIndex']);
 });
 
 

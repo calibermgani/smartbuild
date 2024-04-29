@@ -15,6 +15,8 @@ class PatientRequestProtocolling extends Model
         'protocol_type_id',
         'protocol_notes',
         'protocolling_by',
+        'protocol_details',
+        'add_your_protocol_id',
         'created_by',
         'updated_by',
         'deleted_by'
