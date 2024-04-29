@@ -149,6 +149,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/protocol_types', [ProcedureController::class, 'protocolTypes']);
     Route::any('/store_protocol_request', [ProcedureController::class, 'storeProtocolRequest']);
     Route::any('/store_shopping_cart', [ProcedureController::class, 'storeShoppingCart']);
+    Route::any('/check_list_index', [ProcedureController::class, 'checkListIndex']);
 });
 
 

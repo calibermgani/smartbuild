@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
 use App\Models\Item\ItemHistory;
+use App\Models\Procedure\CheckList;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
@@ -463,7 +464,30 @@ class ProcedureController extends Controller
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'protocol_request' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'shopping_cart' => $data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function checkListIndex(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data['requesting'] = CheckList::where('check_list_stage', 'Requesting')->get();
+            $data['scheduling'] = CheckList::where('check_list_stage', 'Scheduling')->get();
+            $data['pre_procedure'] = CheckList::where('check_list_stage', 'Pre-procedure')->get();
+            $data['intra_procedure'] = CheckList::where('check_list_stage', 'Intra-procedure')->get();
+            $data['post_procedure'] = CheckList::where('check_list_stage', 'Post-procedure')->get();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'check_list' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
