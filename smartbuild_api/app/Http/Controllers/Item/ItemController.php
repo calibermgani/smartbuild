@@ -155,6 +155,7 @@ class ItemController extends Controller
                             $procedures = ItemProcedure::selectRaw('GROUP_CONCAT(procedures.procedure_name) as procedure_names')
                                 ->leftJoin('procedures', 'procedures.id', '=', 'item_procedures.procedure_id')
                                 ->whereIn('item_procedures.procedure_id', $data)
+                                ->where('item_procedures.item_id', $item->id)
                                 ->groupBy('item_procedures.item_id')
                                 ->first();
                             $item->setAttribute('item_procedure_id', $procedures->procedure_names);
