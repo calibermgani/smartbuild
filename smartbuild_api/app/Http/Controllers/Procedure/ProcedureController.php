@@ -13,6 +13,7 @@ use App\Models\Procedure\ProtocolType;
 use App\Models\Procedure\ShoppingCart;
 use App\Models\Procedure\ShoppingTypes;
 use App\Models\Procedure\VettingTypes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
 use Illuminate\Support\Facades\Log;
@@ -457,6 +458,7 @@ class ProcedureController extends Controller
             } else {
                 $request['quantity'] = null;
             }
+            $request['purchased_date'] = Carbon::now()->format('Y-m-d');
             $data = ShoppingCart::create($request->all());
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
