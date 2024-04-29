@@ -414,6 +414,13 @@ class ItemController extends Controller
                 $item->deleted_at = Carbon::now();
                 $item->save();
 
+                $procedure = ItemProcedure::where('item_id', $item->id)->get();
+                if(isset($procedure) && !empty($procedure)){
+                    foreach ($procedure as $key => $value) {
+                        $value->delete();
+                    }
+                }
+
                 $history['history_type'] = 'item';
                 $history['data_id'] = $item->id;
                 $history['action_by'] = 1;
