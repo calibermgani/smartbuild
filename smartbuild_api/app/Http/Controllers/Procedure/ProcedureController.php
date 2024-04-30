@@ -577,4 +577,30 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function storeIntraProcedure(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+            if (isset($data['procedure']) && !empty($data['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $data['procedure'])->first();
+                $data['procedure_id'] = $procedure->id;
+            } else {
+                $data['procedure_id'] = null;
+            }
+            if (isset($data['item_id']) && !empty($data['item_id'])) {
+                ProcedureItemType::create($data);
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Intra Procedure items created successfully', 'code' => 200, 'store_intra_procedure' => $data]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
