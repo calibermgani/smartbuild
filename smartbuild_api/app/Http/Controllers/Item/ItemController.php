@@ -409,6 +409,7 @@ class ItemController extends Controller
 
             $items = Item::whereIn('id', $request->item_id)->get();
             foreach ($items as $item) {
+                $item->item_procedure_id = null;
                 $item->deleted_by = $request->deleted_by;
                 $item->deleted_reason = $request->deleted_reason;
                 $item->deleted_at = Carbon::now();
