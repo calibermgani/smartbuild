@@ -608,12 +608,24 @@ class ProcedureController extends Controller
             } else {
                 $data['procedure_id'] = null;
             }
-            if (isset($data['item_id']) && !empty($data['item_id'])) {
-                ProcedureItemType::create($data);
+            if (count($data['item_id']) > 0 && isset($data['item_id'])) {
+                foreach ($data['item_id'] as $key => $item) {
+                    $intra_procedure = new ProcedureItemType();
+                    $intra_procedure->item_id = $item;
+                    $intra_procedure->patient_id = $data['patient_id'];
+                    $intra_procedure->procedure_id = $data['procedure_id'];
+                    $intra_procedure->mrn_no = $data['mrn_no'];
+                    $intra_procedure->accession_no = $data['accession_no'];
+                    $intra_procedure->no_of_qty = $data['no_of_qty'][$key];
+                    $intra_procedure->type = $data['type'][$key];
+                    $intra_procedure->notes = $data['notes'][$key];
+                    $intra_procedure->created_by = $data['created_by'];
+                    $intra_procedure->save();
+                }
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Intra Procedure items created successfully', 'code' => 200, 'store_intra_procedure' => $data]);
+            return response()->json(['status' => 'Success', 'message' => 'Intra Procedure items created successfully', 'code' => 200, 'store_intra_procedure' => $intra_procedure]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
