@@ -566,7 +566,23 @@ class ProcedureController extends Controller
                 ])
                 ->where('patient_id', $request->patient_id)
                 ->groupBy('item_id')
-                ->get()->toArray();
+                ->get();
+            $itemQuantity = $data->map(function ($item) use ($request){
+                $quantity = ProcedureItemType::select([
+                    DB::raw('sum(no_of_qty) as no_of_qty'),
+                ])
+                    ->where('patient_id', $request->patient_id)
+                    ->where('item_id', $item->item_id)
+                    ->groupBy('item_id')
+                    ->first();
+                if ($quantity) {
+                    $total_no_of_qty = $item->quantity - $quantity->no_of_qty;
+                    $item->setAttribute('total_no_of_qty', $total_no_of_qty);
+                } else {
+                    $item->setAttribute('total_no_of_qty', $item->quantity);
+                }
+                return $item;
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
