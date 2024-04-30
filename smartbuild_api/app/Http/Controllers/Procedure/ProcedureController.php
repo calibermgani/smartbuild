@@ -466,27 +466,25 @@ class ProcedureController extends Controller
             } else {
                 $request['stage_type_id'] = null;
             }
-            if (isset($request->item_id) && $request->item_id != null) {
-                $request['item_id'] = implode(',', $request->item_id);
-            } else {
-                $request['item_id'] = null;
-            }
-
-            if (isset($request->quantity) && $request->quantity != null) {
-                $request['quantity'] = implode(',', $request->quantity);
-            } else {
-                $request['quantity'] = null;
-            }
             $request['purchased_date'] = Carbon::now()->format('Y-m-d');
-            $data = ShoppingCart::create($request->all());
-            if (empty($data)) {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            if (isset($request->item_id) &&count($request->item_id) > 0) {
+                if (is_array($request->quantity)) {
+                    foreach ($request->item_id as $key => $item) {
+                        if (isset($request->quantity[$key])) {
+                            $requestData = $request->all();
+                            $requestData['item_id'] = $item;
+                            $requestData['quantity'] = $request->quantity[$key];
+                            $data = ShoppingCart::create($requestData);
+                        }
+                    }
+                }
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'shopping_cart' => $data]);
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
+            return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'shopping_cart' => $data]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -552,6 +550,31 @@ class ProcedureController extends Controller
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function intraProcedureIndex(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = ShoppingCart::with('intra_procedure_items')->select([
+                'item_id as item_id',
+                DB::raw('sum(quantity) as quantity'),
+                ])
+                ->where('patient_id', $request->patient_id)
+                ->groupBy('item_id')
+                ->get()->toArray();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Intra Procedure items retrieved successfully', 'code' => 200, 'total_count' => count($data), 'intra_procedure_index' => $data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 }

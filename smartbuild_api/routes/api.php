@@ -152,6 +152,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/check_list_index', [ProcedureController::class, 'checkListIndex']);
     Route::any('/add_your_protocol', [ProcedureController::class, 'addYourProtocol']);
     Route::any('/vetting_protocol_index', [ProcedureController::class, 'vettingProtocolIndex']);
+    Route::any('/intra_procedure_index', [ProcedureController::class, 'intraProcedureIndex']);
 });
 
 

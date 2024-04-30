@@ -2,8 +2,10 @@
 
 namespace App\Models\Procedure;
 
+use App\Models\Item\Item;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ShoppingCart extends Model
@@ -23,4 +25,9 @@ class ShoppingCart extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function intra_procedure_items(): HasOne
+    {
+        return $this->hasOne(Item::class, 'id', 'item_id');
+    }
 }
