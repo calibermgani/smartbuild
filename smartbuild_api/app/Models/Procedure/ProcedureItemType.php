@@ -15,6 +15,7 @@ class ProcedureItemType extends Model
     protected $table = 'procedure_item_types';
     protected $fillable = [
         'item_id',
+        'patient_id',
         'procedure_id',
         'mrn_no',
         'accession_no',
