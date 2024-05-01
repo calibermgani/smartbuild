@@ -257,6 +257,14 @@ class ProcedureController extends Controller
                 $data->setAttribute('checkboxSelection', true);
                 return $data;
             });
+
+            $date_of_birth = $data->map(function ($data) {
+                if (isset($data->DOB) && $data->DOB != null) {
+                    $age = Carbon::parse($data->DOB)->age;
+
+                    $data->setAttribute('Age', $age);
+                }
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
