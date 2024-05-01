@@ -283,6 +283,10 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name) as patient_name'))->where('id', $request->patient_id)->first();
+            if (isset($data->dob) && $data->dob != null) {
+                $dob = Carbon::parse($data->dob)->age;
+                $data->setAttribute('age', $dob);
+            }
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
