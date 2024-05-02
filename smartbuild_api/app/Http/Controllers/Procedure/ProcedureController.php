@@ -702,8 +702,15 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $request['procedure_id'] = $procedure->id;
+            } else {
+                $request['procedure_id'] = null;
+            }
             $used_data = ProcedureItemType::with('item')
                 ->where('patient_id', $request->patient_id)
+                ->where('procedure_id', $request['procedure_id'])
                 ->where('type', 'Used')
                 ->get();
             if (empty($used_data)) {
@@ -723,14 +730,77 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $request['procedure_id'] = $procedure->id;
+            } else {
+                $request['procedure_id'] = null;
+            }
             $damaged_data = ProcedureItemType::with('item')
                 ->where('patient_id', $request->patient_id)
+                ->where('procedure_id', $request['procedure_id'])
                 ->where('type', 'Damaged')
                 ->get();
             if (empty($damaged_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
             return response()->json(['status' => 'Success', 'message' => 'Damaged data retrieved successfully', 'code' => 200, 'damaged_data' => $damaged_data]);
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function returnedData(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $request['procedure_id'] = $procedure->id;
+            } else {
+                $request['procedure_id'] = null;
+            }
+            $returned_data = ProcedureItemType::with('item')
+                ->where('patient_id', $request->patient_id)
+                ->where('procedure_id', $request['procedure_id'])
+                ->where('type', 'Returned')
+                ->get();
+            if (empty($returned_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Returned data retrieved successfully', 'code' => 200, 'damaged_data' => $returned_data]);
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function wastedData(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $request['procedure_id'] = $procedure->id;
+            } else {
+                $request['procedure_id'] = null;
+            }
+            $wasted_data = ProcedureItemType::with('item')
+                ->where('patient_id', $request->patient_id)
+                ->where('procedure_id', $request['procedure_id'])
+                ->where('type', 'Wasted')
+                ->get();
+            if (empty($wasted_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Wasted data retrieved successfully', 'code' => 200, 'damaged_data' => $wasted_data]);
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
