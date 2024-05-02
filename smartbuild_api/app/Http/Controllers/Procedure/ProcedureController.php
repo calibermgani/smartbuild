@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
 use App\Imports\PatientDataImport;
+use App\Models\Item\Item;
 use App\Models\Item\ItemHistory;
 use App\Models\Procedure\AddYourProtocol;
 use App\Models\Procedure\CheckList;
@@ -676,6 +677,13 @@ class ProcedureController extends Controller
                     $intra_procedure->notes = $data['notes'][$key];
                     $intra_procedure->created_by = $data['created_by'];
                     $intra_procedure->save();
+                    if ($intra_procedure->type == 'Used' || $intra_procedure->type == 'Damaged' || $intra_procedure->type == 'Wasted') {
+                        $item = Item::where('id', $item)->first();
+                        if(isset($item) && !empty($item)){
+                            $item->store_qty = $item->store_qty - $data['no_of_qty'][$key];
+                            $item->save();
+                        }
+                    }
                 }
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
