@@ -93,6 +93,7 @@ Route::prefix('items')->group(function () {
     Route::any('/restored_inactive_items', [ItemController::class, 'restoredInactiveItems']);
     Route::any('/item_low_stock', [ItemController::class, 'itemLowStock']);
     Route::any('/item_history_details', [ItemController::class, 'itemHistoryDetails']);
+    Route::any('/procedure_item_dashboard', [ItemController::class, 'procedureItemDashboard']);
 });
 
 Route::prefix('sizes')->group(function () {
@@ -156,6 +157,9 @@ Route::prefix('procedures')->group(function () {
     Route::any('/store_intra_procedure', [ProcedureController::class, 'storeIntraProcedure']);
     Route::any('/used_data', [ProcedureController::class, 'usedData']);
     Route::any('/damaged_data', [ProcedureController::class, 'damagedData']);
+    Route::any('/returned_data', [ProcedureController::class, 'returnedData']);
+    Route::any('/wasted_data', [ProcedureController::class, 'wastedData']);
+    Route::any('/back_to_cabinet', [ProcedureController::class, 'backToCabinetList']);
 });
 
 

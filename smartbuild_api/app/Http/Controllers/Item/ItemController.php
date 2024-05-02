@@ -9,6 +9,7 @@ use App\Models\Category\SubCategory;
 use App\Models\Item\ItemHistory;
 use App\Models\Item\ItemSetAlertNotification;
 use App\Models\Procedure\Procedure;
+use App\Models\Procedure\ProcedureItemType;
 use App\Models\Vendor\Vendor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -1217,6 +1218,43 @@ class ItemController extends Controller
             $itemHistory->setAttribute('image_url', $imageUrl);
 
             return response()->json(['status' => 'Success', 'message' => 'Item low stock data retrieved successfully', 'code' => 200, 'data' => $itemHistory]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function procedureItemDashboard(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data['item_recall'] = Item::where('tag', 'like', '%Recall%')->get()->count();
+            $data['item_refill_to_cabinet'] = Item::with(['item_category' ,'item_sub_category','item_vendor', 'item_procedures'])
+                ->whereRaw('COALESCE(cabinet_qty, 0) <= 50')
+                ->get()->count();
+            $data['item_low_stock'] = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+            ->whereRaw('COALESCE(store_qty, 0) <= 50')
+            ->get()->count();
+
+            $startDate = Carbon::now()->format('Y-m-d');
+            $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
+            $data['near_expired_items'] = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                ->whereBetween('expired_date', [$startDate, $endDate])
+                ->get()->count();
+            $data['damaged_items'] = ProcedureItemType::with(['procedure', 'item'])->select([
+                'mrn_no',
+                'item_id',
+                'accession_no',
+                DB::raw('SUM(no_of_qty) as total_qty')
+            ])
+                ->where('type', 'Damaged')
+                ->groupBy('mrn_no', 'item_id', 'accession_no')
+                ->get()->count();
+
+            return response()->json(['status' => 'Success', 'message' => 'Dashboard counts', 'code' => 200, 'data' => $data]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);

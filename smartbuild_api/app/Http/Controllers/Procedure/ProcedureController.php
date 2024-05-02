@@ -145,7 +145,15 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = ProcedureItemType::with(['procedure', 'item'])->where('type', 'Damaged')->get();
+            $data = ProcedureItemType::with(['procedure', 'item'])->select([
+                    'mrn_no',
+                    'item_id',
+                    'accession_no',
+                    DB::raw('SUM(no_of_qty) as total_qty')
+                ])
+                    ->where('type', 'Damaged')
+                    ->groupBy('mrn_no', 'item_id', 'accession_no')
+                    ->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -801,6 +809,36 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
             return response()->json(['status' => 'Success', 'message' => 'Wasted data retrieved successfully', 'code' => 200, 'damaged_data' => $wasted_data]);
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function backToCabinetList(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = ProcedureItemType::with(['procedure', 'item'])->select([
+                    'mrn_no',
+                    'item_id',
+                    'accession_no',
+                    DB::raw('SUM(no_of_qty) as total_qty')
+                ])
+                    ->where('type', 'Returned')
+                    ->groupBy('mrn_no', 'item_id', 'accession_no')
+                    ->get();
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Returned Item retrieved successfully', 'code' => 200, 'total_count' => count($data), 'back_to_cabinet_list' => $data]);
+            }
+
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
