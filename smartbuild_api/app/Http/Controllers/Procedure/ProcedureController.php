@@ -479,24 +479,43 @@ class ProcedureController extends Controller
                 $request['stage_type_id'] = null;
             }
             $request['purchased_date'] = Carbon::now()->format('Y-m-d');
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $request['procedure_id'] = $procedure->id;
+            } else {
+                $request['procedure_id'] = null;
+            }
             if (isset($request->item_id) &&count($request->item_id) > 0) {
                 if (is_array($request->quantity)) {
                     foreach ($request->item_id as $key => $item) {
-                        if (isset($request->quantity[$key])) {
-                            $requestData = $request->all();
-                            $requestData['item_id'] = $item;
-                            $requestData['quantity'] = $request->quantity[$key];
-                            $data = ShoppingCart::create($requestData);
+                        $existingData = ShoppingCart::where('item_id', $item)
+                            ->where('patient_id', $request->patient_id)
+                            ->where('mrn_number', $request->mrn_number)
+                            ->where('purchased_date', Carbon::now()->format('Y-m-d'))
+                            ->where('stage_type_id', $request['stage_type_id'])
+                            ->first();
+                        if (isset($existingData)) {
+                            $existingData->quantity = $request->quantity[$key];
+                            $existingData->purchased_by = $request->purchased_by;
+                            $existingData->created_by = $request->created_by;
+                            $existingData->save();
+                        } else {
+                            if (isset($request->quantity[$key])) {
+                                $requestData = $request->all();
+                                $requestData['item_id'] = $item;
+                                $requestData['quantity'] = $request->quantity[$key];
+                                $data = ShoppingCart::create($requestData);
+                            }
                         }
                     }
                 }
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200, 'shopping_cart' => $data]);
+            return response()->json(['status' => 'Success', 'message' => 'Shopping cart created successfully', 'code' => 200]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -572,19 +591,43 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
+            if (isset($request['procedure']) && !empty($request['procedure'])) {
+                $procedure = Procedure::where('procedure_name', $request['procedure'])->first();
+                $procedure_id = $procedure->id;
+            } else {
+                $procedure_id = null;
+            }
             $data = ShoppingCart::with('intra_procedure_items')->select([
                 'item_id as item_id',
                 DB::raw('sum(quantity) as quantity'),
                 ])
                 ->where('patient_id', $request->patient_id)
+                ->where('mrn_number', $request->mrn_number)
+                ->whereDate('purchased_date', Carbon::now()->format('Y-m-d'))
+                ->where(function ($query) use ($procedure_id) {
+                    if (isset($procedure_id) && $procedure_id != null) {
+                        $query->where('procedure_id', $procedure_id);
+                    } else {
+                        $query;
+                    }
+                })
                 ->groupBy('item_id')
                 ->get();
-            $itemQuantity = $data->map(function ($item) use ($request){
+            $itemQuantity = $data->map(function ($item) use ($request, $procedure_id){
                 $quantity = ProcedureItemType::select([
                     DB::raw('sum(no_of_qty) as no_of_qty'),
                 ])
                     ->where('patient_id', $request->patient_id)
                     ->where('item_id', $item->item_id)
+                    ->where('mrn_no', $request->mrn_number)
+                    ->whereDate('created_at', Carbon::now()->format('Y-m-d'))
+                    ->where(function ($query) use ($procedure_id) {
+                        if (isset($procedure_id) && $procedure_id != null) {
+                            $query->where('procedure_id', $procedure_id);
+                        } else {
+                            $query;
+                        }
+                    })
                     ->groupBy('item_id')
                     ->first();
                 if ($quantity) {
@@ -640,7 +683,50 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Intra Procedure items created successfully', 'code' => 200, 'store_intra_procedure' => $intra_procedure]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+
+    public function usedData(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $used_data = ProcedureItemType::with('item')
+                ->where('patient_id', $request->patient_id)
+                ->where('type', 'Used')
+                ->get();
+            if (empty($used_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Used data retrieved successfully', 'code' => 200, 'used_data' => $used_data]);
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function damagedData(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $damaged_data = ProcedureItemType::with('item')
+                ->where('patient_id', $request->patient_id)
+                ->where('type', 'Damaged')
+                ->get();
+            if (empty($damaged_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Damaged data retrieved successfully', 'code' => 200, 'damaged_data' => $damaged_data]);
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 }

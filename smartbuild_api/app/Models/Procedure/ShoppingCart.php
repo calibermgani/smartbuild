@@ -17,6 +17,7 @@ class ShoppingCart extends Model
         'mrn_number',
         'item_id',
         'patient_id',
+        'procedure_id',
         'quantity',
         'stage_type_id',
         'purchased_date',

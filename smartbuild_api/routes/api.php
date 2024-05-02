@@ -153,6 +153,9 @@ Route::prefix('procedures')->group(function () {
     Route::any('/add_your_protocol', [ProcedureController::class, 'addYourProtocol']);
     Route::any('/vetting_protocol_index', [ProcedureController::class, 'vettingProtocolIndex']);
     Route::any('/intra_procedure_index', [ProcedureController::class, 'intraProcedureIndex']);
+    Route::any('/store_intra_procedure', [ProcedureController::class, 'storeIntraProcedure']);
+    Route::any('/used_data', [ProcedureController::class, 'usedData']);
+    Route::any('/damaged_data', [ProcedureController::class, 'damagedData']);
 });
 
 
