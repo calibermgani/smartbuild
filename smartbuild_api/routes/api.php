@@ -160,6 +160,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/returned_data', [ProcedureController::class, 'returnedData']);
     Route::any('/wasted_data', [ProcedureController::class, 'wastedData']);
     Route::any('/back_to_cabinet', [ProcedureController::class, 'backToCabinetList']);
+    Route::any('/daily_consumed', [ProcedureController::class, 'dailyConsumed']);
 });
 
 
