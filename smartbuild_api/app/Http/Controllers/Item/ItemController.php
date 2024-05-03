@@ -1241,17 +1241,34 @@ class ItemController extends Controller
 
             $startDate = Carbon::now()->format('Y-m-d');
             $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
-            $data['near_expired_items'] = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
-                ->whereBetween('expired_date', [$startDate, $endDate])
+            $data['near_expired_items'] = Item::whereBetween('expired_date', [$startDate, $endDate])
                 ->get()->count();
-            $data['damaged_items'] = ProcedureItemType::with(['procedure', 'item'])->select([
+            $data['damaged_items'] = ProcedureItemType::select([
                 'mrn_no',
                 'item_id',
-                'accession_no',
-                DB::raw('SUM(no_of_qty) as total_qty')
+                'accession_no'
             ])
                 ->where('type', 'Damaged')
                 ->groupBy('mrn_no', 'item_id', 'accession_no')
+                ->get()->count();
+
+            $data['back_to_cabinet'] = ProcedureItemType::with(['item'])->select([
+                'mrn_no',
+                'item_id',
+                'accession_no',
+                DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
+            ])
+                ->where('type', 'Returned')
+                ->groupBy('mrn_no', 'item_id', 'accession_no')
+                ->get()->count();
+
+            $data['daily_consumed'] = ProcedureItemType::select(
+                'mrn_no',
+                'accession_no',
+                DB::raw('GROUP_CONCAT(DISTINCT item_id) as item_id'),
+                DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
+                )
+                ->groupBy('mrn_no', 'accession_no')
                 ->get()->count();
 
             return response()->json(['status' => 'Success', 'message' => 'Dashboard counts', 'code' => 200, 'data' => $data]);

@@ -824,15 +824,22 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $data = ProcedureItemType::with(['procedure', 'item'])->select([
+            $data = ProcedureItemType::with(['item'])->select([
                     'mrn_no',
                     'item_id',
                     'accession_no',
-                    DB::raw('SUM(no_of_qty) as total_qty')
+                    DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
                 ])
                     ->where('type', 'Returned')
                     ->groupBy('mrn_no', 'item_id', 'accession_no')
                     ->get();
+            $procedure_details = $data->map(function ($procedure) {
+                $procedure_id = explode(',', $procedure->procedure_id);
+                $procedures = Procedure::whereIn('id', $procedure_id)->get();
+                $procedure->setAttribute('procedures', $procedures);
+                return $procedure;
+            });
+
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -843,6 +850,45 @@ class ProcedureController extends Controller
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function dailyConsumed(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = ProcedureItemType::select('mrn_no', 'accession_no', DB::raw('GROUP_CONCAT(DISTINCT item_id) as item_id'), DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id'))
+                ->groupBy('mrn_no', 'accession_no')
+                ->get();
+
+            $item_details = $data->map(function ($item) {
+                $item_id = explode(',', $item->item_id);
+                $items = Item::whereIn('id', $item_id)->get();
+                $item->setAttribute('items', $items);
+                return $item;
+            });
+
+            $procedure_details = $data->map(function ($procedure) {
+                $procedure_id = explode(',', $procedure->procedure_id);
+                $procedures = Procedure::whereIn('id', $procedure_id)->get();
+                $procedure->setAttribute('procedures', $procedures);
+                return $procedure;
+            });
+
+            if (empty($data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Daily Consumed Items retrieved successfully', 'code' => 200, 'total_count' => count($data), 'daily_consumed_list' => $data]);
+            }
+
+
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 }
