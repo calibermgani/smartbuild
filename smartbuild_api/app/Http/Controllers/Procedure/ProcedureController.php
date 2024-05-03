@@ -274,6 +274,15 @@ class ProcedureController extends Controller
                     $data->setAttribute('Age', $age);
                 }
             });
+
+            $location = $data->map(function ($data) {
+                if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
+                    $state = $data->town_city . ' - ' . $data->state;
+                    $data->setAttribute('Location', $state);
+                }else{
+                    $data->setAttribute('Location', null);
+                }
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
