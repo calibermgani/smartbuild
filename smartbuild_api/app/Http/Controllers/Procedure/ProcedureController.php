@@ -347,7 +347,8 @@ class ProcedureController extends Controller
 
             $procedure = Procedure::with(['procedure_item', 'procedure_item.item_details'])
                 ->whereHas('procedure_item.item_details' , function ($query) {
-                    $query->where('status', 'Active');
+                    $query->where('status', 'Active')
+                        ->whereNot('item_entry_status', 'clone');
                 })
                 ->where('procedure_name', 'like', '%' . $request->procedure . '%')
                 ->first();
