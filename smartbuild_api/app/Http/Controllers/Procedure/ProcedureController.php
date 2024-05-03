@@ -370,23 +370,23 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
-            $patientRequest = PatientsRequest::create($request->all());
-            if(isset($patientRequest) && !empty($patientRequest)){
-                $patientDetails = PatientsInformation::where('id', $patientRequest->patient_id)->first();
-                if(isset($patientDetails) && !empty($patientDetails)){
-                    $patientDetails->exam_status = $request->status;
-                    $patientDetails->save();
-                }
-            } else {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            $oldPatientRequest = PatientsRequest::where('patient_id', $request->patient_id)->first();
+            if(isset($oldPatientRequest) && !empty($oldPatientRequest)){
+                $oldPatientRequest->update($request->all());
+            }else{
+                $patientRequest = PatientsRequest::create($request->all());
+            }
+            $patientDetails = PatientsInformation::where('id', $request->patient_id)->first();
+            if(isset($patientDetails) && !empty($patientDetails)){
+                $patientDetails->exam_status = $request->status;
+                $patientDetails->save();
             }
 
-            return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200, 'patient_request' => $patientRequest]);
+            return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200]);
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
