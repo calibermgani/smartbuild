@@ -345,11 +345,11 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $procedure = Procedure::with(['procedure_item', 'procedure_item.item_details'])
-                ->whereHas('procedure_item.item_details' , function ($query) {
-                    $query->where('status', 'Active')
-                        ->whereNot('item_entry_status', 'clone');
-                })
+            $procedure = Procedure::with([
+                'procedure_item',
+                'procedure_item.item_details' => function ($query) {
+                    $query->where('item_entry_status', '!=', 'clone');}
+                ])
                 ->where('procedure_name', 'like', '%' . $request->procedure . '%')
                 ->first();
             if (empty($procedure)) {
@@ -890,6 +890,24 @@ class ProcedureController extends Controller
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function itemUniqueList(Request $request)
+    {
+        {
+            try {
+                $token = $request->token;
+
+                if (!$this->user_authentication($token)) {
+                    return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+                }
+                $items = Item::whereNot('item_entry_status', 'clone')->get();
+                return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
+            } catch (\Exception $e) {
+                log::debug($e->getMessage());
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            }
         }
     }
 }
