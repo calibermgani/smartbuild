@@ -372,14 +372,21 @@ class ProcedureController extends Controller
             }
 
             $patientRequest = PatientsRequest::create($request->all());
-            if (empty($patientRequest)) {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            if(isset($patientRequest) && !empty($patientRequest)){
+                $patientDetails = PatientsInformation::where('id', $patientRequest->patient_id)->first();
+                if(isset($patientDetails) && !empty($patientDetails)){
+                    $patientDetails->exam_status = $request->status;
+                    $patientDetails->save();
+                }
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200, 'patient_request' => $patientRequest]);
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
+
+            return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200, 'patient_request' => $patientRequest]);
+
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
