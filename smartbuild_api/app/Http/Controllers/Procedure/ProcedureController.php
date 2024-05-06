@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Procedure;
 
 use App\Http\Controllers\Controller;
-use App\Imports\PatientDataImport;
+use App\Imports\PatientInformationImport;
 use App\Models\Item\Item;
 use App\Models\Item\ItemHistory;
 use App\Models\Procedure\AddYourProtocol;
@@ -23,6 +23,7 @@ use App\Models\Procedure\Procedure;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProcedureController extends Controller
 {
@@ -207,8 +208,8 @@ class ProcedureController extends Controller
                 ->where('history_type_id', '1')
                 ->get();
             $itemsWithImageUrl = $data['item']->map(function ($item) {
-                if ($item->image_url) {
-                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                if ($item['item_history']['image_url']) {
+                    $imageUrl = Storage::url('item_images/'.$item['item_history']['spid'].'/'. $item['item_history']['image_url']);
                 } else {
                     $imageUrl = null;
                 }
@@ -274,6 +275,15 @@ class ProcedureController extends Controller
                     $data->setAttribute('Age', $age);
                 }
             });
+
+            $location = $data->map(function ($data) {
+                if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
+                    $state = $data->town_city . ' - ' . $data->state;
+                    $data->setAttribute('Location', $state);
+                }else{
+                    $data->setAttribute('Location', null);
+                }
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -314,26 +324,27 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            // if ($request->attachment != '') {
-            //     $attachmentName = $request->attachment->getClientOriginalName();
-            //     $extension = $request->attachment->getClientOriginalExtension();
-            //     $onlyFileName = pathinfo($attachmentName, PATHINFO_FILENAME);
-            //     $fileName = str_replace(' ', '_', $onlyFileName);
-            //     $fileNames = $fileName . '_' . date('YmdHis') . '.' . $extension;
+            if ($request->attachment != '') {
+                $attachmentName = $request->attachment->getClientOriginalName();
+                $extension = $request->attachment->getClientOriginalExtension();
+                $onlyFileName = pathinfo($attachmentName, PATHINFO_FILENAME);
+                $fileName = str_replace(' ', '_', $onlyFileName);
+                $fileNames = $fileName . '_' . date('YmdHis') . '.' . $extension;
 
-            //     if (!Storage::exists('public/importFiles')) {
-            //         $storage_path = Storage::makeDirectory('importFiles', 0775, true);
-            //         $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
-            //     } else {
-            //         $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
-            //     }
-            //     $import_data = new PatientDataImport($fileNames);
-            // }
+                if (!Storage::exists('public/importFiles')) {
+                    $storage_path = Storage::makeDirectory('importFiles', 0775, true);
+                    $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+                } else {
+                    $path = $request->attachment->storeAs('public/importFiles/', $fileNames);
+                }
+                $import_data = new PatientInformationImport();
+                Excel::import($import_data, $request->file('attachment')->store('files'));
+            }
 
-            return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200]);
+            return response()->json(['status' => 'Success', 'message' => 'Patient data imported successfully', 'code' => 200]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -710,7 +721,6 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
-
 
     public function usedData(Request $request){
         try {

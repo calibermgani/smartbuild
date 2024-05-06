@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('mrn_number')->nullable();
             $table->unsignedBigInteger('patient_id');
-            $table->enum('status', ['Accept', 'Reject'])->nullable();
+            $table->enum('status', ['Accepted', 'Rejected'])->nullable();
             $table->integer('accepted_by')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
