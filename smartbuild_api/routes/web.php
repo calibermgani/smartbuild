@@ -18,6 +18,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/php_info', function () {
+    return include_once(public_path('php_info.php'));
+});
 
 
 
