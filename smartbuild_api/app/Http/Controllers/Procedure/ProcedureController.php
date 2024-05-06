@@ -208,8 +208,8 @@ class ProcedureController extends Controller
                 ->where('history_type_id', '1')
                 ->get();
             $itemsWithImageUrl = $data['item']->map(function ($item) {
-                if ($item->image_url) {
-                    $imageUrl = Storage::url('item_images/'.$item->spid.'/'.$item->image_url);
+                if ($item['item_history']['image_url']) {
+                    $imageUrl = Storage::url('item_images/'.$item['item_history']['spid'].'/'. $item['item_history']['image_url']);
                 } else {
                     $imageUrl = null;
                 }
