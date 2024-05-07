@@ -162,6 +162,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/back_to_cabinet', [ProcedureController::class, 'backToCabinetList']);
     Route::any('/daily_consumed', [ProcedureController::class, 'dailyConsumed']);
     Route::any('/item_unique_list', [ProcedureController::class, 'itemUniqueList']);
+    Route::any('/procedure_sub_status', [ProcedureController::class, 'procedureSubStatus']);
 });
 
 

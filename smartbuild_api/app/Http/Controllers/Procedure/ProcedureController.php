@@ -13,6 +13,7 @@ use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
 use App\Models\Procedure\PatientRequestProtocolling;
 use App\Models\Procedure\PatientRequestVetting;
+use App\Models\Procedure\ProcedureSubStatus;
 use App\Models\Procedure\ProtocolType;
 use App\Models\Procedure\ShoppingCart;
 use App\Models\Procedure\ShoppingTypes;
@@ -344,7 +345,7 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Patient data imported successfully', 'code' => 200]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -397,7 +398,7 @@ class ProcedureController extends Controller
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -673,7 +674,7 @@ class ProcedureController extends Controller
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -906,7 +907,7 @@ class ProcedureController extends Controller
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
 
@@ -921,6 +922,31 @@ class ProcedureController extends Controller
                 }
                 $items = Item::whereNot('item_entry_status', 'clone')->get();
                 return response()->json(['status' => 'Success', 'message' => 'Items retrieved successfully', 'code'=>200, 'total_count' => count($items), 'data' => $items], 200);
+            } catch (\Exception $e) {
+                log::debug($e->getMessage());
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            }
+        }
+    }
+
+    public function procedureSubStatus(Request $request)
+    {
+        {
+            try {
+                $token = $request->token;
+
+                if (!$this->user_authentication($token)) {
+                    return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+                }
+                if(isset($request->stage_type) && !empty($request->stage_type)){
+                    $stage_type = ShoppingTypes::where('name', $request->stage_type)->first();
+                    if(!empty($stage_type) && isset($stage_type)){
+                        $procedures_sub_status = ProcedureSubStatus::where('stage_id', $stage_type->id)->get();
+                    }else{
+                        $procedures_sub_status = [];
+                    }
+                }
+                return response()->json(['status' => 'Success', 'message' => 'Procedure Sub Status retrieved successfully', 'code'=>200, 'total_count' => count($procedures_sub_status), 'data' => $procedures_sub_status], 200);
             } catch (\Exception $e) {
                 log::debug($e->getMessage());
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
