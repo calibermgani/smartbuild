@@ -62,6 +62,7 @@ class PatientInformationImport implements ToModel, WithStartRow
             $data['height'] = !empty($row[38]) ? $row[38] : null;
             $data['procedure'] = !empty($row[39]) ? $row[39] : null;
             $data['created_by'] = "1";
+            $data['patient_source_from'] = 'Excel';
             PatientsInformation::create($data);
         }
     }

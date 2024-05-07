@@ -60,6 +60,7 @@ class PatientsInformation extends Model
         'notes',
         'image',
         'procedure',
+        'patient_source_from',
         'created_by',
         'updated_by',
         'deleted_by'

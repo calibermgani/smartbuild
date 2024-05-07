@@ -262,34 +262,9 @@ class ProcedureController extends Controller
                 'weight as Weight',
                 'height as Height',
                 'procedure as Procedure Name',
-                'title',
-                'marital_status',
-                'surname',
-                'name_of_partner',
-                'name_of_children',
-                'referred_by',
-                'occupation',
-                'primary_email',
-                'address_type',
-                'flat_unit_no',
-                'street_no',
-                'street_name',
-                'suburb',
                 'town_city',
                 'state',
-                'post_code',
-                'provider_no',
-                'admission_type',
-                'blood_pressure',
-                'heart_beat',
-                'spo2',
-                'respiratory_rate',
-                'temperature',
-                'critical_information',
-                'notes',
-                'image',
-                'created_by',
-                'updated_by',
+                'patient_source_from',
             ])->get();
 
             $checkBox = $patient_data->map(function ($data) {
@@ -311,6 +286,12 @@ class ProcedureController extends Controller
                     $data->setAttribute('Location', $state);
                 }else{
                     $data->setAttribute('Location', null);
+                }
+            });
+
+            $soure = $patient_data->map(function ($data) {
+                if($data->patient_source_from == null){
+                    $data->setAttribute('patient_source_from', 'HL7');
                 }
             });
             if (empty($patient_data)) {
@@ -347,6 +328,10 @@ class ProcedureController extends Controller
                 $imageUrl = null;
             }
             $patient_data->setAttribute('image', $imageUrl);
+
+            if($patient_data->patient_source_from == null){
+                $patient_data->setAttribute('patient_source_from', 'HL7');
+            }
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -1006,6 +991,7 @@ class ProcedureController extends Controller
 
                 $data = $request->all();
                 if(isset($data) && !empty($data)){
+                    $data['patient_source_from'] = 'Application';
                     $patient_details = PatientsInformation::create($data);
                     if(isset($patient_details->id) && !empty($patient_details->id)){
                         $data['mrn_no'] = 'MR' . $patient_details->id;
