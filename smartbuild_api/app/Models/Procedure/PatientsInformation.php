@@ -13,7 +13,7 @@ class PatientsInformation extends Model
     protected $table = 'patients_information';
     protected $fillable = [
         'title',
-        'martital_status',
+        'marital_status',
         'first_name',
         'middle_name',
         'surname',
@@ -51,6 +51,14 @@ class PatientsInformation extends Model
         'blood_group',
         'weight',
         'height',
+        'blood_pressure',
+        'heart_beat',
+        'spo2',
+        'respiratory_rate',
+        'temperature',
+        'critical_information',
+        'notes',
+        'image',
         'procedure',
         'created_by',
         'updated_by',

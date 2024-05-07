@@ -163,6 +163,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/daily_consumed', [ProcedureController::class, 'dailyConsumed']);
     Route::any('/item_unique_list', [ProcedureController::class, 'itemUniqueList']);
     Route::any('/procedure_sub_status', [ProcedureController::class, 'procedureSubStatus']);
+    Route::any('/store_patient_details', [ProcedureController::class, 'storePatientDetails']);
 });
 
 
