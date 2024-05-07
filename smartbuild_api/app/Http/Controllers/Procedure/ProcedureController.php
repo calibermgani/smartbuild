@@ -341,6 +341,12 @@ class ProcedureController extends Controller
             }else{
                 $patient_data->setAttribute('location', null);
             }
+            if ($patient_data->image) {
+                $imageUrl = Storage::url('item_images/' . $patient_data->id . '/' . $patient_data->image);
+            } else {
+                $imageUrl = null;
+            }
+            $patient_data->setAttribute('image', $imageUrl);
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
@@ -1002,6 +1008,7 @@ class ProcedureController extends Controller
                 if(isset($data) && !empty($data)){
                     $patient_details = PatientsInformation::create($data);
                     if(isset($patient_details->id) && !empty($patient_details->id)){
+                        $data['mrn_no'] = 'MR' . $patient_details->id;
                         if ($request->hasFile('patient_image')) {
                             $filenameWithExt = $request->file('patient_image')->getClientOriginalName();
                             $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
@@ -1014,11 +1021,9 @@ class ProcedureController extends Controller
                                 $path = $request->file('patient_image')->storeAs('public/patient_image/' . $patient_details->id, $fileNameToStore);
                             }
                             $data['image'] = $fileNameToStore;
-                            $data['mrn_no'] = 'MR' . $patient_details->id;
                             $patient_details->update($data);
                         }else{
                             $data['image'] = null;
-                            $data['mrn_no'] = 'MR' . $patient_details->id;
                             $patient_details->update($data);
                         }
                     }
