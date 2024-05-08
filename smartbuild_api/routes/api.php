@@ -166,6 +166,8 @@ Route::prefix('procedures')->group(function () {
     Route::any('/store_patient_details', [ProcedureController::class, 'storePatientDetails']);
     Route::any('/ch_pre_diagnosis_index', [ProcedureController::class, 'chPreDiagnosisIndex']);
     Route::any('/show_vetting_request', [ProcedureController::class, 'showVettingRequest']);
+    Route::any('/show_protocol_request', [ProcedureController::class, 'showProtocolRequest']);
+    Route::any('/ch_pre_diagnosis_store', [ProcedureController::class, 'chPreDiagnosisStore']);
 });
 
 

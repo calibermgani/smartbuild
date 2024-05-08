@@ -1081,4 +1081,46 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
+
+    public function showProtocolRequest(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->mrn_number) && isset($request->patient_id) && $request->mrn_number != null && $request->patient_id != null) {
+                $protocol = PatientRequestProtocolling::where('patient_id', $request->patient_id)
+                    ->where('mrn_number', $request->mrn_number)
+                    ->first();
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Protocol data retrieved successfully', 'code' => 200, 'data' => $protocol]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function chPreDiagnosisStore(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+
+            if (isset($data) && !empty($data)) {
+                $ch_pre_diagnosis = PatientChPreDiagnosis::create($data);
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Protocol data retrieved successfully', 'code' => 200, 'data' => $ch_pre_diagnosis]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
