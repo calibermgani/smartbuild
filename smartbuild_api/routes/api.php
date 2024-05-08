@@ -164,6 +164,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/item_unique_list', [ProcedureController::class, 'itemUniqueList']);
     Route::any('/procedure_sub_status', [ProcedureController::class, 'procedureSubStatus']);
     Route::any('/store_patient_details', [ProcedureController::class, 'storePatientDetails']);
+    Route::any('/ch_pre_diagnosis_index', [ProcedureController::class, 'chPreDiagnosisIndex']);
 });
 
 
