@@ -296,11 +296,11 @@ class ProcedureController extends Controller
             });
 
             $gender = $patient_data->map(function ($data) {
-                if($data->gender == "M-"){
+                if($data->Gender == "M-"){
                     $data->setAttribute('Gender', 'Male');
-                }elseif($data->gender == "F"){
+                }elseif($data->Gender == "F"){
                     $data->setAttribute('Gender', 'Female');
-                }elseif($data->gender == "M"){
+                }elseif($data->Gender == "M"){
                     $data->setAttribute('Gender', 'Male');
                 }
             });
