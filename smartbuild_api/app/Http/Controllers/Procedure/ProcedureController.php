@@ -1117,7 +1117,7 @@ class ProcedureController extends Controller
             } else {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Protocol data retrieved successfully', 'code' => 200, 'data' => $ch_pre_diagnosis]);
+            return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200, 'data' => $ch_pre_diagnosis]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
