@@ -16,6 +16,8 @@ class PatientsRequest extends Model
         'patient_id',
         'status',
         'accepted_by',
+        'reason_note',
+        'reason_type',
         'created_by',
         'updated_by',
         'deleted_by'
