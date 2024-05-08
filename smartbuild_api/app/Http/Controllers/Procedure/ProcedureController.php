@@ -294,6 +294,16 @@ class ProcedureController extends Controller
                     $data->setAttribute('patient_source_from', 'HL7');
                 }
             });
+
+            $gender = $patient_data->map(function ($data) {
+                if($data->gender == "M-"){
+                    $data->setAttribute('Gender', 'Male');
+                }elseif($data->gender == "F"){
+                    $data->setAttribute('Gender', 'Female');
+                }elseif($data->gender == "M"){
+                    $data->setAttribute('Gender', 'Male');
+                }
+            });
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
