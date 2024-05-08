@@ -1120,17 +1120,19 @@ class ProcedureController extends Controller
                 }
                 if (isset($data['diagones_data']) && !empty($data['diagones_data'])) {
                     foreach ($data['diagones_data'] as $diagnosis) {
-                        $ch_pre_diagnosis = PatientChPreDiagnosis::create([
-                            'token' => $data['token'],
-                            'stage_id' => $stage_type->id,
-                            'mrn_number' => $data['mrn_number'],
-                            'patient_id' => $data['patient_id'],
-                            'diagnosis' => $diagnosis['diagnosis'],
-                            'code' => $diagnosis['code'],
-                            'date' => $diagnosis['date'],
-                            'added_by' => $data['added_by'],
-                            'created_by' => $data['created_by']
-                        ]);
+                        if (isset($diagnosis['diagnosis']) && !empty($diagnosis['diagnosis']) && isset($diagnosis['code']) && !empty($diagnosis['code']) && isset($diagnosis['date']) && !empty($diagnosis['date'])) {
+                            $ch_pre_diagnosis = PatientChPreDiagnosis::create([
+                                'token' => $data['token'],
+                                'stage_id' => $stage_type->id,
+                                'mrn_number' => $data['mrn_number'],
+                                'patient_id' => $data['patient_id'],
+                                'diagnosis' => $diagnosis['diagnosis'],
+                                'code' => $diagnosis['code'],
+                                'date' => $diagnosis['date'],
+                                'added_by' => $data['added_by'],
+                                'created_by' => $data['created_by']
+                            ]);
+                        }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200]);
                 } else {
@@ -1144,4 +1146,35 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
+
+    public function chPreDiagnosisDelete(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $ch_pre_diagnosis = PatientChPreDiagnosis::where('id', $data['id'])
+                    ->where('mrn_number', $data['mrn_number'])
+                    ->where('patient_id', $data['patient_id'])
+                    ->first();
+                if (isset($ch_pre_diagnosis) && !empty($ch_pre_diagnosis)) {
+                    $ch_pre_diagnosis->deleted_by = $data['deleted_by'];
+                    $ch_pre_diagnosis->deleted_at = Carbon::now();
+                    $ch_pre_diagnosis->save();
+                }else{
+                    return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+                }
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
 }
