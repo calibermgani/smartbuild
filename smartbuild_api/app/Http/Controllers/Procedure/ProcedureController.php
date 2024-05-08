@@ -1113,11 +1113,32 @@ class ProcedureController extends Controller
             $data = $request->all();
 
             if (isset($data) && !empty($data)) {
-                $ch_pre_diagnosis = PatientChPreDiagnosis::create($data);
+                if(isset($data['stage_type']) && !empty($data['stage_type'])){
+                    $stage_type = ShoppingTypes::where('name', $data['stage_type'])->first();
+                }else{
+                    $stage_type = [];
+                }
+                if (count($data['diagnosis']) === count($data['code']) && count($data['code']) === count($data['date'])) {
+                    foreach ($data['diagnosis'] as $key => $diagnosis) {
+                        $ch_pre_diagnosis = PatientChPreDiagnosis::create([
+                            'stage_id' => $stage_type->id,
+                            'mrn_number' => $data['mrn_number'],
+                            'patient_id' => $data['patient_id'],
+                            'diagnosis' => $diagnosis,
+                            'code' => $data['code'][$key],
+                            'date' => $data['date'][$key],
+                            'added_by' => $data['added_by'],
+                            'created_by' => $data['created_by'],
+                        ]);
+                    }
+
+                    return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200]);
+                } else {
+                    return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
+                }
             } else {
-                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200, 'data' => $ch_pre_diagnosis]);
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
