@@ -1118,20 +1118,20 @@ class ProcedureController extends Controller
                 }else{
                     $stage_type = [];
                 }
-                if (count($data['diagnosis']) === count($data['code']) && count($data['code']) === count($data['date'])) {
-                    foreach ($data['diagnosis'] as $key => $diagnosis) {
+                if (isset($data['diagones_data']) && !empty($data['diagones_data'])) {
+                    foreach ($data['diagones_data'] as $diagnosis) {
                         $ch_pre_diagnosis = PatientChPreDiagnosis::create([
+                            'token' => $data['token'],
                             'stage_id' => $stage_type->id,
                             'mrn_number' => $data['mrn_number'],
                             'patient_id' => $data['patient_id'],
-                            'diagnosis' => $diagnosis,
-                            'code' => $data['code'][$key],
-                            'date' => $data['date'][$key],
+                            'diagnosis' => $diagnosis['diagnosis'],
+                            'code' => $diagnosis['code'],
+                            'date' => $diagnosis['date'],
                             'added_by' => $data['added_by'],
-                            'created_by' => $data['created_by'],
+                            'created_by' => $data['created_by']
                         ]);
                     }
-
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200]);
                 } else {
                     return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
