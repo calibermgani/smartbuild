@@ -11,6 +11,7 @@ use App\Models\Procedure\CheckList;
 use App\Models\Procedure\PatientChIndication;
 use App\Models\Procedure\PatientChPostDiagnosis;
 use App\Models\Procedure\PatientChPreDiagnosis;
+use App\Models\Procedure\PatientLab;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
@@ -1297,6 +1298,35 @@ class ProcedureController extends Controller
                     ->get();
 
                 return response()->json(['status' => 'Success', 'message' => 'Clinical History Post Diagnosis data retrieved successfully', 'code'=>200, 'total_count' => count($ch_post_diagnosis), 'data' => $ch_post_diagnosis], 200);
+            } catch (\Exception $e) {
+                log::debug($e->getMessage());
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            }
+        }
+    }
+
+    public function patientLabIndex(Request $request)
+    {
+        {
+            try {
+                $token = $request->token;
+
+                if (!$this->user_authentication($token)) {
+                    return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+                }
+
+                if(isset($request->stage_type) && !empty($request->stage_type)){
+                    $stage_type = ShoppingTypes::where('name', $request->stage_type)->first();
+                }else{
+                    $stage_type = [];
+                }
+                $patient_lab_data = PatientLab::where('stage_id', $stage_type->id)
+                    ->where('patient_id', $request->patient_id)
+                    ->where('mrn_number', $request->mrn_number)
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+                return response()->json(['status' => 'Success', 'message' => 'Patient Lab data retrieved successfully', 'code'=>200, 'total_count' => count($patient_lab_data), 'data' => $patient_lab_data], 200);
             } catch (\Exception $e) {
                 log::debug($e->getMessage());
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
