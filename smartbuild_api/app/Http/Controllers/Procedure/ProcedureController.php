@@ -1128,7 +1128,7 @@ class ProcedureController extends Controller
                                 'patient_id' => $data['patient_id'],
                                 'diagnosis' => $diagnosis['diagnosis'],
                                 'code' => $diagnosis['code'],
-                                'date' => $diagnosis['date'],
+                                'date' => Carbon::parse($diagnosis['date'])->format('Y-m-d H:i:s'),
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
@@ -1143,7 +1143,7 @@ class ProcedureController extends Controller
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
-            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 
