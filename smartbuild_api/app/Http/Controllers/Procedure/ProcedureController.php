@@ -1177,4 +1177,68 @@ class ProcedureController extends Controller
         }
     }
 
+    public function patientRegistrationList(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $patient_data = PatientsInformation::select([
+                "*",
+                DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'"),
+            ])->get();
+
+            $date_of_birth = $patient_data->map(function ($data) {
+                if (isset($data->dob) && $data->dob != null) {
+                    $age = Carbon::parse($data->don)->age;
+
+                    $data->setAttribute('age', $age);
+                }
+            });
+
+            $location = $patient_data->map(function ($data) {
+                if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
+                    $state = $data->town_city . ' - ' . $data->state;
+                    $data->setAttribute('location', $state);
+                }else{
+                    $data->setAttribute('location', null);
+                }
+            });
+
+            $soure = $patient_data->map(function ($data) {
+                if($data->patient_source_from == null){
+                    $data->setAttribute('patient_source_from', 'HL7');
+                }
+            });
+
+            $gender = $patient_data->map(function ($data) {
+                if($data->gender == "M-"){
+                    $data->setAttribute('Gender', 'Male');
+                }elseif($data->gender == "F"){
+                    $data->setAttribute('Gender', 'Female');
+                }elseif($data->gender == "M"){
+                    $data->setAttribute('Gender', 'Male');
+                }
+            });
+            $image = $patient_data->map(function ($data) {
+                if ($data->image) {
+                    $imageUrl = Storage::url('item_images/' . $data->id . '/' . $data->image);
+                } else {
+                    $imageUrl = null;
+                }
+                $data->setAttribute('image', $imageUrl);
+            });
+
+            if (empty($patient_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'total_count' => count($patient_data), 'patient_list' => $patient_data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
