@@ -243,7 +243,7 @@ class ProcedureController extends Controller
             $patient_data = PatientsInformation::select([
                 DB::raw("true as checkboxSelection"),
                 'id as id',
-                DB::raw("CONCAT(first_name, ' ', middle_name) as 'Name'"),
+                DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'"),
                 'mrn_no as MRN',
                 'gender as Gender',
                 'patient_type as Type',
@@ -266,7 +266,8 @@ class ProcedureController extends Controller
                 'town_city',
                 'state',
                 'patient_source_from',
-            ])->get();
+            ])
+                ->orderBy('id', 'desc')->get();
 
             $checkBox = $patient_data->map(function ($data) {
                 $data->setAttribute('checkboxSelection', true);
@@ -299,7 +300,7 @@ class ProcedureController extends Controller
             $gender = $patient_data->map(function ($data) {
                 if($data->Gender == "M-"){
                     $data->setAttribute('Gender', 'Male');
-                }elseif($data->Gender == "F"){
+                }elseif(trim($data->Gender) == "F"){
                     $data->setAttribute('Gender', 'Female');
                 }elseif($data->Gender == "M"){
                     $data->setAttribute('Gender', 'Male');
@@ -322,7 +323,7 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $patient_data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name) as patient_name'))->where('id', $request->patient_id)->first();
+            $patient_data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
             if (isset($patient_data->dob) && $patient_data->dob != null) {
                 $dob = Carbon::parse($patient_data->dob)->age;
                 $patient_data->setAttribute('age', $dob);
@@ -1051,6 +1052,7 @@ class ProcedureController extends Controller
                 $ch_pre_diagnosis = PatientChPreDiagnosis::where('stage_id', $stage_type->id)
                     ->where('patient_id', $request->patient_id)
                     ->where('mrn_number', $request->mrn_number)
+                    ->orderBy('id', 'desc')
                     ->get();
 
                 return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data retrieved successfully', 'code'=>200, 'total_count' => count($ch_pre_diagnosis), 'data' => $ch_pre_diagnosis], 200);
@@ -1216,7 +1218,7 @@ class ProcedureController extends Controller
             $gender = $patient_data->map(function ($data) {
                 if($data->gender == "M-"){
                     $data->setAttribute('Gender', 'Male');
-                }elseif($data->gender == "F"){
+                }elseif(trim($data->gender) == "F"){
                     $data->setAttribute('Gender', 'Female');
                 }elseif($data->gender == "M"){
                     $data->setAttribute('Gender', 'Male');
