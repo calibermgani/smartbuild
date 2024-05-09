@@ -932,7 +932,7 @@ class ItemController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            if (count($request->item_id) > 0) {
+            if (isset($request->item_id) && !empty($request->item_id)) {
                 foreach ($request->item_id as $key => $item_id) {
                     $item = Item::withTrashed()->find($item_id);
                     if (isset($item) && !empty($item)) {
@@ -943,7 +943,7 @@ class ItemController extends Controller
                     }
                 }
             }
-            if (count($request->category_id) > 0) {
+            if (isset($request->category_id) && !empty($request->category_id)) {
                 foreach ($request->category_id as $key => $category_id) {
                     $category = Category::withTrashed()->find($category_id);
                     if (isset($category) && !empty($category)) {
@@ -954,7 +954,7 @@ class ItemController extends Controller
                     }
                 }
             }
-            if (count($request->sub_category_id) > 0) {
+            if (isset($request->sub_category_id) && !empty($request->sub_category_id)) {
                 foreach ($request->sub_category_id as $key => $sub_category_id) {
                     $sub_category = SubCategory::withTrashed()->find($sub_category_id);
                     if (isset($sub_category) && !empty($sub_category)) {
@@ -965,7 +965,7 @@ class ItemController extends Controller
                     }
                 }
             }
-            if (count($request->vendor_id) > 0) {
+            if (isset($request->vendor_id) && !empty($request->vendor_id)) {
                 foreach ($request->vendor_id as $key => $vendor_id) {
                     $vendor = Vendor::withTrashed()->find($vendor_id);
                     if (isset($vendor) && !empty($vendor)) {
@@ -976,7 +976,7 @@ class ItemController extends Controller
                     }
                 }
             }
-            if (count($request->procedure_id) > 0) {
+            if (isset($request->procedure_id) && !empty($request->procedure_id)) {
                 foreach ($request->procedure_id as $key => $procedure_id) {
                     $procedure = Procedure::withTrashed()->find($procedure_id);
                     if (isset($procedure) && !empty($procedure)) {
