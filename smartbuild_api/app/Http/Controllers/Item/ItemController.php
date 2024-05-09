@@ -956,7 +956,7 @@ class ItemController extends Controller
             }
             if (isset($request->sub_category_id) && !empty($request->sub_category_id)) {
                 foreach ($request->sub_category_id as $key => $sub_category_id) {
-                    $sub_category = SubCategory::withTrashed()->find($sub_category_id);
+                    $sub_category = SubCategory::withTrashed()->where('id', $sub_category_id)->first();
                     if (isset($sub_category) && !empty($sub_category)) {
                         $sub_category->deleted_at = null;
                         $sub_category->deleted_by = null;
