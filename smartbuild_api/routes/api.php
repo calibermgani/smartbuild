@@ -176,6 +176,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/patient_mediation_index', [ProcedureController::class, 'patientMediationIndex']);
     Route::any('/ch_indication_store', [ProcedureController::class, 'chIndicationStore']);
     Route::any('/ch_post_diagnosis_store', [ProcedureController::class, 'chPostDiagnosisStore']);
+    Route::any('/ch_indication_delete', [ProcedureController::class, 'chIndicationDelete']);
 });
 
 

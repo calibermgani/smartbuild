@@ -1452,4 +1452,34 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function chIndicationDelete(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $ch_indication = PatientChIndication::where('id', $data['id'])
+                    ->where('mrn_number', $data['mrn_number'])
+                    ->where('patient_id', $data['patient_id'])
+                    ->first();
+                if (isset($ch_indication) && !empty($ch_indication)) {
+                    $ch_indication->deleted_by = $data['deleted_by'];
+                    $ch_indication->deleted_at = Carbon::now();
+                    $ch_indication->save();
+                }else{
+                    return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+                }
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
