@@ -1363,4 +1363,48 @@ class ProcedureController extends Controller
             }
         }
     }
+
+    public function chIndicationStore(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+
+            if (isset($data) && !empty($data)) {
+                if(isset($data['stage_type']) && !empty($data['stage_type'])){
+                    $stage_type = ShoppingTypes::where('name', $data['stage_type'])->first();
+                }else{
+                    $stage_type = [];
+                }
+                if (isset($data['indication_data']) && !empty($data['indication_data'])) {
+                    foreach ($data['indication_data'] as $indication) {
+                        if (isset($indication['diagnosis']) && !empty($indication['diagnosis']) && isset($indication['code']) && !empty($indication['code']) && isset($indication['date']) && !empty($indication['date'])) {
+                            $ch_indication = PatientChIndication::create([
+                                'token' => $data['token'],
+                                'stage_id' => $stage_type->id,
+                                'mrn_number' => $data['mrn_number'],
+                                'patient_id' => $data['patient_id'],
+                                'diagnosis' => $indication['diagnosis'],
+                                'code' => $indication['code'],
+                                'date' => Carbon::parse($indication['date'])->format('Y-m-d H:i:s'),
+                                'added_by' => $data['added_by'],
+                                'created_by' => $data['created_by']
+                            ]);
+                        }
+                    }
+                    return response()->json(['status' => 'Success', 'message' => 'Clinical History Indication data created successfully', 'code' => 200]);
+                } else {
+                    return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
