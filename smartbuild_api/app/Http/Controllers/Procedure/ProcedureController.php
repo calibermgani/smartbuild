@@ -338,7 +338,8 @@ class ProcedureController extends Controller
                 $patient_data->setAttribute('location', null);
             }
             if ($patient_data->image) {
-                $imageUrl = Storage::url('item_images/' . $patient_data->id . '/' . $patient_data->image);
+                // $imageUrl = Storage::url('item_images/' . $patient_data->id . '/' . $patient_data->image);
+                $imageUrl = Storage::url('patient_image/' . $patient_data->id . '/' . $patient_data->image);
             } else {
                 $imageUrl = null;
             }
