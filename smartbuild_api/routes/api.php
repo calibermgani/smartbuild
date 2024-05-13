@@ -173,6 +173,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/ch_indication_index', [ProcedureController::class, 'chIndicationIndex']);
     Route::any('/ch_post_diagnosis_index', [ProcedureController::class, 'chPostDiagnosisIndex']);
     Route::any('/patient_lab_index', [ProcedureController::class, 'patientLabIndex']);
+    Route::any('/patient_mediation_index', [ProcedureController::class, 'patientMediationIndex']);
 });
 
 
