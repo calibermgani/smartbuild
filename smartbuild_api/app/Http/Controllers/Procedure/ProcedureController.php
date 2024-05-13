@@ -12,6 +12,7 @@ use App\Models\Procedure\PatientChIndication;
 use App\Models\Procedure\PatientChPostDiagnosis;
 use App\Models\Procedure\PatientChPreDiagnosis;
 use App\Models\Procedure\PatientLab;
+use App\Models\Procedure\PatientMediations;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
@@ -1350,7 +1351,7 @@ class ProcedureController extends Controller
                 }else{
                     $stage_type = [];
                 }
-                $patient_mediation = PatientLab::where('stage_id', $stage_type->id)
+                $patient_mediation = PatientMediations::where('stage_id', $stage_type->id)
                     ->where('patient_id', $request->patient_id)
                     ->where('mrn_number', $request->mrn_number)
                     ->orderBy('id', 'desc')
@@ -1396,6 +1397,50 @@ class ProcedureController extends Controller
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Indication data created successfully', 'code' => 200]);
+                } else {
+                    return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function chPostDiagnosisStore(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+
+            if (isset($data) && !empty($data)) {
+                if(isset($data['stage_type']) && !empty($data['stage_type'])){
+                    $stage_type = ShoppingTypes::where('name', $data['stage_type'])->first();
+                }else{
+                    $stage_type = [];
+                }
+                if (isset($data['post_diagnosis_data']) && !empty($data['post_diagnosis_data'])) {
+                    foreach ($data['post_diagnosis_data'] as $post_diagnosis) {
+                        if (isset($post_diagnosis['diagnosis']) && !empty($post_diagnosis['diagnosis']) && isset($post_diagnosis['code']) && !empty($post_diagnosis['code']) && isset($post_diagnosis['date']) && !empty($post_diagnosis['date'])) {
+                            $ch_post_diagnosis = PatientChPostDiagnosis::create([
+                                'token' => $data['token'],
+                                'stage_id' => $stage_type->id,
+                                'mrn_number' => $data['mrn_number'],
+                                'patient_id' => $data['patient_id'],
+                                'diagnosis' => $post_diagnosis['diagnosis'],
+                                'code' => $post_diagnosis['code'],
+                                'date' => Carbon::parse($post_diagnosis['date'])->format('Y-m-d H:i:s'),
+                                'added_by' => $data['added_by'],
+                                'created_by' => $data['created_by']
+                            ]);
+                        }
+                    }
+                    return response()->json(['status' => 'Success', 'message' => 'Clinical History Post-Diagnosis data created successfully', 'code' => 200]);
                 } else {
                     return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
                 }
