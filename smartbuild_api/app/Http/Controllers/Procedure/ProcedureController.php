@@ -1630,4 +1630,34 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function patientMediationDelete(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $patient_mediation_data = PatientLab::where('id', $data['id'])
+                    ->where('mrn_number', $data['mrn_number'])
+                    ->where('patient_id', $data['patient_id'])
+                    ->first();
+                if (isset($patient_mediation_data) && !empty($patient_mediation_data)) {
+                    $patient_mediation_data->deleted_by = $data['deleted_by'];
+                    $patient_mediation_data->deleted_at = Carbon::now();
+                    $patient_mediation_data->save();
+                }else{
+                    return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+                }
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
