@@ -1139,6 +1139,8 @@ class ProcedureController extends Controller
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
+                        } else {
+                            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Pre-Diagnosis data created successfully', 'code' => 200]);
@@ -1176,6 +1178,8 @@ class ProcedureController extends Controller
                 }else{
                     return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
                 }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
@@ -1394,6 +1398,8 @@ class ProcedureController extends Controller
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
+                        } else {
+                            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Indication data created successfully', 'code' => 200]);
@@ -1438,6 +1444,8 @@ class ProcedureController extends Controller
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
+                        } else {
+                            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Clinical History Post-Diagnosis data created successfully', 'code' => 200]);
@@ -1475,6 +1483,8 @@ class ProcedureController extends Controller
                 }else{
                     return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
                 }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
@@ -1505,6 +1515,8 @@ class ProcedureController extends Controller
                 }else{
                     return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
                 }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
@@ -1542,6 +1554,8 @@ class ProcedureController extends Controller
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
+                        } else {
+                            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Patient Lab data created successfully', 'code' => 200]);
@@ -1579,6 +1593,8 @@ class ProcedureController extends Controller
                 }else{
                     return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
                 }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
@@ -1616,6 +1632,8 @@ class ProcedureController extends Controller
                                 'added_by' => $data['added_by'],
                                 'created_by' => $data['created_by']
                             ]);
+                        } else {
+                            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
                     return response()->json(['status' => 'Success', 'message' => 'Patient Lab data created successfully', 'code' => 200]);
@@ -1642,7 +1660,7 @@ class ProcedureController extends Controller
             $data = $request->all();
 
             if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
-                $patient_mediation_data = PatientLab::where('id', $data['id'])
+                $patient_mediation_data = PatientMediations::where('id', $data['id'])
                     ->where('mrn_number', $data['mrn_number'])
                     ->where('patient_id', $data['patient_id'])
                     ->first();
@@ -1653,6 +1671,8 @@ class ProcedureController extends Controller
                 }else{
                     return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
                 }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
         } catch (\Exception $e) {
