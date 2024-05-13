@@ -1512,4 +1512,48 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
+
+    public function patientLabStore(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+
+            if (isset($data) && !empty($data)) {
+                if(isset($data['stage_type']) && !empty($data['stage_type'])){
+                    $stage_type = ShoppingTypes::where('name', $data['stage_type'])->first();
+                }else{
+                    $stage_type = [];
+                }
+                if (isset($data['patient_lab_data']) && !empty($data['patient_lab_data'])) {
+                    foreach ($data['patient_lab_data'] as $patient_lab) {
+                        if (isset($patient_lab['test_name']) && !empty($patient_lab['test_name']) && isset($patient_lab['result']) && !empty($patient_lab['result']) && isset($patient_lab['date']) && !empty($patient_lab['date'])) {
+                            $patient_lab_data = PatientLab::create([
+                                'token' => $data['token'],
+                                'stage_id' => $stage_type->id,
+                                'mrn_number' => $data['mrn_number'],
+                                'patient_id' => $data['patient_id'],
+                                'test_name' => $patient_lab['test_name'],
+                                'result' => $patient_lab['result'],
+                                'date' => Carbon::parse($patient_lab['date'])->format('Y-m-d H:i:s'),
+                                'added_by' => $data['added_by'],
+                                'created_by' => $data['created_by']
+                            ]);
+                        }
+                    }
+                    return response()->json(['status' => 'Success', 'message' => 'Patient Lab data created successfully', 'code' => 200]);
+                } else {
+                    return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No data found'], 204);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

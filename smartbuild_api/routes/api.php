@@ -178,6 +178,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/ch_post_diagnosis_store', [ProcedureController::class, 'chPostDiagnosisStore']);
     Route::any('/ch_indication_delete', [ProcedureController::class, 'chIndicationDelete']);
     Route::any('/ch_post_diagnosis_delete', [ProcedureController::class, 'chPostDiagnosisDelete']);
+    Route::any('/patient_lab_store', [ProcedureController::class, 'patientLabStore']);
 });
 
 
