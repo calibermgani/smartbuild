@@ -597,15 +597,15 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $data['requesting'] = CheckList::where('check_list_stage', 'Requesting')->get();
-            $data['scheduling'] = CheckList::where('check_list_stage', 'Scheduling')->get();
-            $data['pre_procedure'] = CheckList::where('check_list_stage', 'Pre-procedure')->get();
-            $data['intra_procedure'] = CheckList::where('check_list_stage', 'Intra-procedure')->get();
-            $data['post_procedure'] = CheckList::where('check_list_stage', 'Post-procedure')->get();
+            $data['requesting'] = CheckList::where('check_list_stage', 'Requesting')->orderBy('ordering', 'asc')->get();
+            $data['scheduling'] = CheckList::where('check_list_stage', 'Scheduling')->orderBy('ordering', 'asc')->get();
+            $data['pre_procedure'] = CheckList::where('check_list_stage', 'Pre-procedure')->orderBy('ordering', 'asc')->get();
+            $data['intra_procedure'] = CheckList::where('check_list_stage', 'Intra-procedure')->orderBy('ordering', 'asc')->get();
+            $data['post_procedure'] = CheckList::where('check_list_stage', 'Post-procedure')->orderBy('ordering', 'asc')->get();
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Protocol request created successfully', 'code' => 200, 'check_list' => $data]);
+                return response()->json(['status' => 'Success', 'message' => 'Check list retrieved successfully', 'code' => 200, 'check_list' => $data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
