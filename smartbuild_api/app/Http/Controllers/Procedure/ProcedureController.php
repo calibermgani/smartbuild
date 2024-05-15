@@ -1030,7 +1030,6 @@ class ProcedureController extends Controller
                             $data['image'] = null;
                             $patient_details->update($data);
                         }
-                        $patient_procedure_data = PatientProcedureInformation::create($data);
                     }
                 }
                 return response()->json(['status' => 'Success', 'message' => 'Patient details added successfully', 'code'=>200, 'data' => $patient_details], 200);
@@ -1795,6 +1794,50 @@ class ProcedureController extends Controller
                 }
             } else {
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required field missing'], 500);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientDetailsUpdate(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $data = $request->all();
+            if(isset($data) && !empty($data)){
+                $patient_data = PatientsInformation::where('id', $request->patient_id)->first();
+                if(isset($patient_data) && !empty($patient_data)){
+                    $data['patient_source_from'] = 'Application';
+                    if (isset($request->patient_image) && !empty($request->patient_image)) {
+                        dd($request->patient_image);
+                        $requestedImageUrl = $request->patient_image;
+                        $requestedImageName = pathinfo($request->patient_image, PATHINFO_BASENAME);
+                        if ($requestedImageName === $patient_data->image_url) {
+                            $data['image'] = $requestedImageName;
+                        } else {
+                            if ($request->hasFile('patient_image')) {
+                                $filenameWithExt = $request->file('patient_image')->getClientOriginalName();
+                                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                                $extension = $request->file('patient_image')->getClientOriginalExtension();
+                                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                                if (!Storage::exists('public/patient_image/' . $patient_data->id)) {
+                                    $storage_path = Storage::makeDirectory('public/patient_image/' . $patient_data->id, 0775, true);
+                                    $path = $request->file('patient_image')->storeAs('public/patient_image/' . $patient_data->id, $fileNameToStore);
+                                } else {
+                                    $path = $request->file('patient_image')->storeAs('public/patient_image/' . $patient_data->id, $fileNameToStore);
+                                }
+                                $data['image'] = $fileNameToStore;
+                            }
+                        }
+                    }
+                    $patient_data->update($data);
+                    return response()->json(['status' => 'Success', 'message' => 'Patient details updated successfully', 'code'=>200, 'data' => $patient_data], 200);
+                }
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
