@@ -1746,7 +1746,7 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $patient_data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
+            $patient_data = PatientsInformation::with(['patient_procedure'])->select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
             if (isset($patient_data->dob) && $patient_data->dob != null) {
                 $dob = Carbon::parse($patient_data->dob)->age;
                 $patient_data->setAttribute('age', $dob);

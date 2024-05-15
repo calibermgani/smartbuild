@@ -4,6 +4,7 @@ namespace App\Models\Procedure;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PatientsInformation extends Model
@@ -65,4 +66,9 @@ class PatientsInformation extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function patient_procedure(): HasOne
+    {
+        return $this->hasOne(Procedure::class, 'id', 'procedure');
+    }
 }
