@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->integer('stage_id')->nullable();
             $table->integer('patient_id')->nullable();
+            $table->string('procedure')->nullable();
             $table->string('mrn_number')->nullable();
             $table->string('diagnosis')->nullable();
             $table->string('code')->nullable();
