@@ -1637,7 +1637,7 @@ class ProcedureController extends Controller
                             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
                         }
                     }
-                    return response()->json(['status' => 'Success', 'message' => 'Patient Lab data created successfully', 'code' => 200]);
+                    return response()->json(['status' => 'Success', 'message' => 'Patient mediation data created successfully', 'code' => 200]);
                 } else {
                     return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Invalid data format'], 400);
                 }

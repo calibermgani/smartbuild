@@ -16,6 +16,7 @@ class PatientLab extends Model
         'stage_id',
         'patient_id',
         'mrn_number',
+        'procedure',
         'test_name',
         'result',
         'date',

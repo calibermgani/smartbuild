@@ -17,6 +17,7 @@ class PatientChPreDiagnosis extends Model
         'stage_id',
         'patient_id',
         'mrn_number',
+        'procedure',
         'diagnosis',
         'code',
         'date',
