@@ -140,8 +140,8 @@ Route::prefix('procedures')->group(function () {
     Route::any('/item_damaged', [ProcedureController::class, 'itemDamagedList']);
     Route::any('/item_wasted', [ProcedureController::class, 'itemWastedList']);
     Route::any('/item_history', [ProcedureController::class, 'itemHistory']);
-    Route::any('/patient_list', [ProcedureController::class, 'patientList']);
-    Route::any('/patient_details', [ProcedureController::class, 'patientDetails']);
+    Route::any('/patient_procedure_list', [ProcedureController::class, 'patientProcedureList']);
+    Route::any('/patient_procedure_details', [ProcedureController::class, 'patientProcedureDetails']);
     Route::any('/patient_import', [ProcedureController::class, 'patientImport']);
     Route::any('/material_my_cart', [ProcedureController::class, 'materialMyCart']);
     Route::any('/patient_request', [ProcedureController::class, 'patientRequest']);
@@ -182,6 +182,8 @@ Route::prefix('procedures')->group(function () {
     Route::any('/patient_lab_delete', [ProcedureController::class, 'patientLabDelete']);
     Route::any('/patient_mediation_store', [ProcedureController::class, 'patientMediationStore']);
     Route::any('/patient_mediation_delete', [ProcedureController::class, 'patientMediationDelete']);
+    Route::any('/patient_list', [ProcedureController::class, 'patientList']);
+    Route::any('/patient_details', [ProcedureController::class, 'patientDetails']);
 });
 
 

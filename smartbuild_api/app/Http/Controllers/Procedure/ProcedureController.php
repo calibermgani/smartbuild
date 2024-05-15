@@ -13,6 +13,7 @@ use App\Models\Procedure\PatientChPostDiagnosis;
 use App\Models\Procedure\PatientChPreDiagnosis;
 use App\Models\Procedure\PatientLab;
 use App\Models\Procedure\PatientMediations;
+use App\Models\Procedure\PatientProcedureInformation;
 use App\Models\Procedure\PatientsInformation;
 use App\Models\Procedure\PatientsRequest;
 use App\Models\Procedure\ProcedureItemType;
@@ -236,7 +237,7 @@ class ProcedureController extends Controller
         }
     }
 
-    public function patientList(Request $request){
+    public function patientProcedureList(Request $request){
         try {
             $token = $request->token;
 
@@ -244,7 +245,7 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $patient_data = PatientsInformation::select([
+            $patient_data = PatientProcedureInformation::select([
                 DB::raw("true as checkboxSelection"),
                 'id as id',
                 DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'"),
@@ -313,7 +314,7 @@ class ProcedureController extends Controller
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Patient List data retrieved successfully', 'code' => 200, 'total_count' => count($patient_data), 'patient_list' => $patient_data]);
+                return response()->json(['status' => 'Success', 'message' => 'Patient Procedure List data retrieved successfully', 'code' => 200, 'total_count' => count($patient_data), 'patient_list' => $patient_data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -321,13 +322,13 @@ class ProcedureController extends Controller
         }
     }
 
-    public function patientDetails(Request $request){
+    public function patientProcedureDetails(Request $request){
         try {
             $token = $request->token;
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $patient_data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
+            $patient_data = PatientProcedureInformation::with(['patient_requests'])->select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
             if (isset($patient_data->dob) && $patient_data->dob != null) {
                 $dob = Carbon::parse($patient_data->dob)->age;
                 $patient_data->setAttribute('age', $dob);
@@ -339,7 +340,6 @@ class ProcedureController extends Controller
                 $patient_data->setAttribute('location', null);
             }
             if ($patient_data->image) {
-                // $imageUrl = Storage::url('item_images/' . $patient_data->id . '/' . $patient_data->image);
                 $imageUrl = Storage::url('patient_image/' . $patient_data->id . '/' . $patient_data->image);
             } else {
                 $imageUrl = null;
@@ -352,7 +352,7 @@ class ProcedureController extends Controller
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
-                return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'patient' => $patient_data]);
+                return response()->json(['status' => 'Success', 'message' => 'Patient procedure data retrieved successfully', 'code' => 200, 'patient' => $patient_data]);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -1029,6 +1029,7 @@ class ProcedureController extends Controller
                             $data['image'] = null;
                             $patient_details->update($data);
                         }
+                        $patient_procedure_data = PatientProcedureInformation::create($data);
                     }
                 }
                 return response()->json(['status' => 'Success', 'message' => 'Patient details added successfully', 'code'=>200, 'data' => $patient_details], 200);
@@ -1675,6 +1676,102 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required fields missing'], 500);
             }
             return response()->json(['status' => 'Success', 'message' => 'Data deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientList(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $patient_data = PatientsInformation::orderBy('id', 'desc')->get();
+
+            $checkBox = $patient_data->map(function ($data) {
+                $data->setAttribute('checkboxSelection', true);
+                return $data;
+            });
+
+            $date_of_birth = $patient_data->map(function ($data) {
+                if (isset($data->DOB) && $data->DOB != null) {
+                    $age = Carbon::parse($data->DOB)->age;
+
+                    $data->setAttribute('Age', $age);
+                }
+            });
+
+            $location = $patient_data->map(function ($data) {
+                if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
+                    $state = $data->town_city . ' - ' . $data->state;
+                    $data->setAttribute('Location', $state);
+                }else{
+                    $data->setAttribute('Location', null);
+                }
+            });
+
+            $soure = $patient_data->map(function ($data) {
+                if($data->patient_source_from == null){
+                    $data->setAttribute('patient_source_from', 'HL7');
+                }
+            });
+
+            $gender = $patient_data->map(function ($data) {
+                if($data->Gender == "M-"){
+                    $data->setAttribute('Gender', 'Male');
+                }elseif(trim($data->Gender) == "F"){
+                    $data->setAttribute('Gender', 'Female');
+                }elseif($data->Gender == "M"){
+                    $data->setAttribute('Gender', 'Male');
+                }
+            });
+            if (empty($patient_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Patient List data retrieved successfully', 'code' => 200, 'total_count' => count($patient_data), 'patient_list' => $patient_data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientDetails(Request $request){
+        try {
+            $token = $request->token;
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            $patient_data = PatientsInformation::select('*', DB::raw('concat(first_name, " ", middle_name, " ", surname) as patient_name'))->where('id', $request->patient_id)->first();
+            if (isset($patient_data->dob) && $patient_data->dob != null) {
+                $dob = Carbon::parse($patient_data->dob)->age;
+                $patient_data->setAttribute('age', $dob);
+            }
+            if (isset($patient_data->town_city) && $patient_data->town_city != null && isset($patient_data->state) && $patient_data->state != null) {
+                $state = $patient_data->town_city . ' - ' . $patient_data->state;
+                $patient_data->setAttribute('location', $state);
+            }else{
+                $patient_data->setAttribute('location', null);
+            }
+            if ($patient_data->image) {
+                $imageUrl = Storage::url('patient_image/' . $patient_data->id . '/' . $patient_data->image);
+            } else {
+                $imageUrl = null;
+            }
+            $patient_data->setAttribute('image', $imageUrl);
+
+            if($patient_data->patient_source_from == null){
+                $patient_data->setAttribute('patient_source_from', 'HL7');
+            }
+            if (empty($patient_data)) {
+                return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
+            } else {
+                return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'patient' => $patient_data]);
+            }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
