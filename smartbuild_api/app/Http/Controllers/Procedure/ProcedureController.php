@@ -1814,7 +1814,6 @@ class ProcedureController extends Controller
                 if(isset($patient_data) && !empty($patient_data)){
                     $data['patient_source_from'] = 'Application';
                     if (isset($request->patient_image) && !empty($request->patient_image)) {
-                        dd($request->patient_image);
                         $requestedImageUrl = $request->patient_image;
                         $requestedImageName = pathinfo($request->patient_image, PATHINFO_BASENAME);
                         if ($requestedImageName === $patient_data->image_url) {
