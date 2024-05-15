@@ -1843,4 +1843,26 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
+
+    public function patientDetailsDelete(Request $request)
+    {
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $patient_data = PatientsInformation::where('id', $request->patient_id)->first();
+            if(isset($patient_data) && !empty($patient_data)){
+                $patient_data->deleted_by = $request->deleted_by;
+                $patient_data->deleted_at = Carbon::now();
+                $patient_data->save();
+            }
+            return response()->json(['status' => 'Success', 'message' => 'Patient data deleted successfully', 'code' => 200]);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
