@@ -14,6 +14,8 @@ class PatientProcedureInformation extends Model
     protected $table = 'patient_procedure_information';
     protected $fillable = [
         'title',
+        'patient_id',
+        'stage_id',
         'marital_status',
         'first_name',
         'middle_name',

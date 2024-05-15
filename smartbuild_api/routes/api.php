@@ -184,6 +184,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/patient_mediation_delete', [ProcedureController::class, 'patientMediationDelete']);
     Route::any('/patient_list', [ProcedureController::class, 'patientList']);
     Route::any('/patient_details', [ProcedureController::class, 'patientDetails']);
+    Route::any('/patient_procedure_request', [ProcedureController::class, 'patientProcedureRequest']);
 });
 
 

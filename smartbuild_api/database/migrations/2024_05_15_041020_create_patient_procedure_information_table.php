@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('patient_procedure_information', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title')->nullable();
+            $table->integer('patient_id')->nullable();
             $table->string('martital_status')->nullable();
             $table->string('first_name')->nullable();
             $table->string('middle_name')->nullable();

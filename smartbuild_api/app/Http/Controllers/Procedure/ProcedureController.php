@@ -424,13 +424,14 @@ class ProcedureController extends Controller
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-            $oldPatientRequest = PatientsRequest::where('patient_id', $request->patient_id)->first();
-            if(isset($oldPatientRequest) && !empty($oldPatientRequest)){
-                $oldPatientRequest->update($request->all());
-            }else{
-                $patientRequest = PatientsRequest::create($request->all());
-            }
-            $patientDetails = PatientsInformation::where('id', $request->patient_id)->first();
+            // $oldPatientRequest = PatientsRequest::where('patient_id', $request->patient_id)->first();
+            // if(isset($oldPatientRequest) && !empty($oldPatientRequest)){
+            //     $oldPatientRequest->update($request->all());
+            // }else{
+            // }
+            $patientRequest = PatientsRequest::create($request->all());
+
+            $patientDetails = PatientProcedureInformation::where('id', $request->patient_id)->first();
             if(isset($patientDetails) && !empty($patientDetails)){
                 $patientDetails->exam_status = $request->status;
                 $patientDetails->save();
@@ -1771,6 +1772,29 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
                 return response()->json(['status' => 'Success', 'message' => 'Patient data retrieved successfully', 'code' => 200, 'patient' => $patient_data]);
+            }
+        } catch (\Exception $e) {
+            Log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientProcedureRequest(Request $request){
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if (isset($request->patient_id) && $request->patient_id != null) {
+                $patient_data = PatientsInformation::where('id', $request->patient_id)->first();
+                if (isset($patient_data) && $patient_data != null) {
+                    $patient_data['patient_id'] = $patient_data->id;
+                    $patient_procedure_data = PatientProcedureInformation::create($patient_data->toArray());
+                    return response()->json(['status' => 'Success', 'message' => 'Patient request created successfully', 'code' => 200]);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Required field missing'], 500);
             }
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
