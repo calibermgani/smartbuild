@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patient_request_protocollings', function (Blueprint $table) {
-            $table->string('protocol_details')->nullable();
-            $table->integer('add_your_protocol_id')->nullable();
+            $table->string('protocol_details')->after('protocolling_by')->nullable();
+            $table->integer('add_your_protocol')->after('protocol_details')->nullable();
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     {
         Schema::table('patient_request_protocollings', function (Blueprint $table) {
             $table->dropColumn('protocol_details');
-            $table->dropColumn('add_your_protocol_id');
+            $table->dropColumn('add_your_protocol');
         });
     }
 };
