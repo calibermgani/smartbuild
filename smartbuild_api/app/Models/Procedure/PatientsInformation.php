@@ -62,6 +62,7 @@ class PatientsInformation extends Model
         'image',
         'procedure',
         'patient_source_from',
+        'changed_flag',
         'created_by',
         'updated_by',
         'deleted_by'

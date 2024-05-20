@@ -14,6 +14,7 @@ class PatientsRequest extends Model
     protected $fillable = [
         'mrn_number',
         'patient_id',
+        'procedure',
         'status',
         'accepted_by',
         'reason_note',
