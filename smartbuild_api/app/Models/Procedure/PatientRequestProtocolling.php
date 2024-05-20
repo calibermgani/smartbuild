@@ -4,6 +4,7 @@ namespace App\Models\Procedure;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PatientRequestProtocolling extends Model
@@ -21,4 +22,9 @@ class PatientRequestProtocolling extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function protocolling_types(): HasOne
+    {
+        return $this->hasOne(ProtocolType::class, 'id', 'protocol_type_id');
+    }
 }

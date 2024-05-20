@@ -4,6 +4,7 @@ namespace App\Models\Procedure;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PatientRequestVetting extends Model
@@ -21,4 +22,9 @@ class PatientRequestVetting extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function vetting_types(): HasOne
+    {
+        return $this->hasOne(VettingTypes::class, 'id', 'vetting_type_id');
+    }
 }
