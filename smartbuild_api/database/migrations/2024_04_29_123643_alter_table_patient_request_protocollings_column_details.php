@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('patient_request_protocollings', function (Blueprint $table) {
             $table->string('protocol_details')->after('protocolling_by')->nullable();
-            $table->integer('add_your_protocol')->after('protocol_details')->nullable();
+            $table->string('add_your_protocol')->after('protocol_details')->nullable();
         });
     }
 
