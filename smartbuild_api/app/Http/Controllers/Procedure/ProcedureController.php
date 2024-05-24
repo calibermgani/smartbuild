@@ -839,7 +839,7 @@ class ProcedureController extends Controller
             if (empty($returned_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Returned data retrieved successfully', 'code' => 200, 'damaged_data' => $returned_data]);
+            return response()->json(['status' => 'Success', 'message' => 'Returned data retrieved successfully', 'code' => 200, 'returned_data' => $returned_data]);
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
@@ -867,7 +867,7 @@ class ProcedureController extends Controller
             if (empty($wasted_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             }
-            return response()->json(['status' => 'Success', 'message' => 'Wasted data retrieved successfully', 'code' => 200, 'damaged_data' => $wasted_data]);
+            return response()->json(['status' => 'Success', 'message' => 'Wasted data retrieved successfully', 'code' => 200, 'wasted_data' => $wasted_data]);
 
         } catch (\Exception $e) {
             Log::debug($e->getMessage());
