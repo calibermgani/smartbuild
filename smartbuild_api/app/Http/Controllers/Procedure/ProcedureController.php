@@ -24,6 +24,7 @@ use App\Models\Procedure\ProtocolType;
 use App\Models\Procedure\ShoppingCart;
 use App\Models\Procedure\ShoppingTypes;
 use App\Models\Procedure\VettingTypes;
+use App\Models\Procedure\KizinTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
@@ -1862,6 +1863,44 @@ class ProcedureController extends Controller
         } catch (\Exception $e) {
             log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function kizinTasks(Request $request)
+    {
+        try {
+            $token = $request->token;
+
+            $data = $request->all();
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+            if(isset($data['stage_type']) && !empty($data['stage_type'])){
+                $stage_type = ShoppingTypes::where('name', $data['stage_type'])->first();
+                if(isset($stage_type) && !empty($stage_type)){
+                    $data['stage_id'] = $stage_type->id;
+                }else{
+                    $data['stage_id'] = null;
+                }
+            }
+            if (isset($request->checked) && $request->checked == true) {
+                $data['checklist_date'] = Carbon::now()->format('Y-m-d');
+                $kizin_tasks = KizinTask::create($data);
+
+                return response()->json(['status' => 'Success', 'message' => 'Kizin Task data saved successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
+            } else {
+                $kizin_tasks = KizinTask::where('checklist_id', $data['checklist_id'])->first();
+                $kizin_tasks->deleted_by = 1;
+                $kizin_tasks->deleted_at = Carbon::now();
+                $kizin_tasks->save();
+
+                return response()->json(['status' => 'Success', 'message' => 'Kizin Task data deleted successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
+            }
+
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 }
