@@ -1924,4 +1924,22 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function kizinTimelines(Request $request)
+    {
+        try {
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $kizin_timelines = KizinTimeline::get();
+            
+            return response()->json(['status' => 'Success', 'message' => 'Kizin Timelines data retrieved successfully', 'code' => 200, 'data' => $kizin_timelines], 200);
+        } catch (\Exception $e) {
+            log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
 }
