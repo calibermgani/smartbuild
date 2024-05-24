@@ -25,6 +25,7 @@ use App\Models\Procedure\ShoppingCart;
 use App\Models\Procedure\ShoppingTypes;
 use App\Models\Procedure\VettingTypes;
 use App\Models\Procedure\KizinTask;
+use App\Models\Procedure\KizinTimeline;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Procedure\Procedure;
@@ -1892,8 +1893,16 @@ class ProcedureController extends Controller
                     $data['deleted_at'] = null;
                     $data['updated_by'] = 1;
                     $kizin_tasks = $old_data->update($data);
-                }else{
+                    if (isset($kizin_tasks) && !empty($kizin_tasks)) {
+                        $data['kizin_task_id'] = $old_data->id;
+                        KizinTimeline::create($data);
+                    }
+                } else {
                     $kizin_tasks = KizinTask::create($data);
+                    if (isset($kizin_tasks) && !empty($kizin_tasks)) {
+                        $data['kizin_task_id'] = $kizin_tasks->id;
+                        KizinTimeline::create($data);
+                    }
                 }
                 return response()->json(['status' => 'Success', 'message' => 'Kizin Task data saved successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
             } else {
@@ -1901,14 +1910,15 @@ class ProcedureController extends Controller
                 $kizin_tasks->deleted_by = 1;
                 $kizin_tasks->deleted_at = Carbon::now();
                 $kizin_tasks->save();
+                if (isset($kizin_tasks) && !empty($kizin_tasks)) {
+                    $data['kizin_task_id'] = $kizin_tasks->id;
+                    KizinTimeline::create($data);
+                }
 
                 return response()->json(['status' => 'Success', 'message' => 'Kizin Task data deleted successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
             }
 
-            if (isset($kizin_tasks) && !empty($kizin_tasks)) {
-                $data['kizin_task_id'] = $kizin_tasks->id;
-                KizinTimeline::create($data);
-            }
+            
         } catch (\Exception $e) {
             log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
