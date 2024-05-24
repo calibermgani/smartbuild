@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kizin_tasks', function (Blueprint $table) {
+        Schema::create('kizin_timelines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('stage_id')->nullable();
             $table->integer('patient_id')->nullable();
             $table->string('mrn_no')->nullable();
             $table->string('procedure')->nullable();
-            $table->integer('checklist_id')->nullable();
-            $table->date('checklist_date')->nullable();
+            $table->integer('kizin_task_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kizin_tasks');
+        Schema::dropIfExists('kizin_timelines');
     }
 };

@@ -1884,10 +1884,17 @@ class ProcedureController extends Controller
                     $data['stage_id'] = null;
                 }
             }
-            if (isset($request->checked) && $request->checked == true) {
+            if (isset($data['checked']) && $data['checked'] == true) {
                 $data['checklist_date'] = Carbon::now()->format('Y-m-d');
-                $kizin_tasks = KizinTask::create($data);
-
+                $old_data = KizinTask::withTrashed()->where('checklist_id', $data['checklist_id'])->first();
+                if (isset($old_data) && !empty($old_data)) {
+                    $data['deleted_by'] = null;
+                    $data['deleted_at'] = null;
+                    $data['updated_by'] = 1;
+                    $kizin_tasks = $old_data->update($data);
+                }else{
+                    $kizin_tasks = KizinTask::create($data);
+                }
                 return response()->json(['status' => 'Success', 'message' => 'Kizin Task data saved successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
             } else {
                 $kizin_tasks = KizinTask::where('checklist_id', $data['checklist_id'])->first();
@@ -1898,6 +1905,10 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'Success', 'message' => 'Kizin Task data deleted successfully', 'code' => 200, 'data' => $kizin_tasks], 200);
             }
 
+            if (isset($kizin_tasks) && !empty($kizin_tasks)) {
+                $data['kizin_task_id'] = $kizin_tasks->id;
+                KizinTimeline::create($data);
+            }
         } catch (\Exception $e) {
             log::debug($e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);

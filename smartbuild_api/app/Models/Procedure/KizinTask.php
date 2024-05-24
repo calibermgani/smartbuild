@@ -23,6 +23,7 @@ class KizinTask extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'deleted_at',
     ];
 
 }
