@@ -745,22 +745,24 @@ class ProcedureController extends Controller
             }
             if (count($data['item_id']) > 0 && isset($data['item_id'])) {
                 foreach ($data['item_id'] as $key => $item) {
-                    $intra_procedure = new ProcedureItemType();
-                    $intra_procedure->item_id = $item;
-                    $intra_procedure->patient_id = $data['patient_id'];
-                    $intra_procedure->procedure_id = $data['procedure_id'];
-                    $intra_procedure->mrn_no = $data['mrn_no'];
-                    $intra_procedure->accession_no = $data['accession_no'];
-                    $intra_procedure->no_of_qty = $data['no_of_qty'][$key];
-                    $intra_procedure->type = $data['type'][$key];
-                    $intra_procedure->notes = $data['notes'][$key];
-                    $intra_procedure->created_by = $data['created_by'];
-                    $intra_procedure->save();
-                    if ($intra_procedure->type == 'Used' || $intra_procedure->type == 'Damaged' || $intra_procedure->type == 'Wasted') {
-                        $item = Item::where('id', $item)->first();
-                        if(isset($item) && !empty($item)){
-                            $item->store_qty = $item->store_qty - $data['no_of_qty'][$key];
-                            $item->save();
+                    if ($data['no_of_qty'][$key]) {
+                        $intra_procedure = new ProcedureItemType();
+                        $intra_procedure->item_id = $item;
+                        $intra_procedure->patient_id = $data['patient_id'];
+                        $intra_procedure->procedure_id = $data['procedure_id'];
+                        $intra_procedure->mrn_no = $data['mrn_no'];
+                        $intra_procedure->accession_no = $data['accession_no'];
+                        $intra_procedure->no_of_qty = $data['no_of_qty'][$key];
+                        $intra_procedure->type = $data['type'][$key];
+                        $intra_procedure->notes = $data['notes'][$key];
+                        $intra_procedure->created_by = $data['created_by'];
+                        $intra_procedure->save();
+                        if ($intra_procedure->type == 'Used' || $intra_procedure->type == 'Damaged' || $intra_procedure->type == 'Wasted') {
+                            $item = Item::where('id', $item)->first();
+                            if(isset($item) && !empty($item)){
+                                $item->store_qty = $item->store_qty - $data['no_of_qty'][$key];
+                                $item->save();
+                            }
                         }
                     }
                 }
