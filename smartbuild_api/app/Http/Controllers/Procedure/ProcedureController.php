@@ -601,6 +601,16 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
             $data = CheckList::where('check_list_stage', $request->stage_type)->orderBy('ordering', 'asc')->get();
+
+            $checked = $data->map(function ($data) {
+                $kizin_tasks_data = KizinTask::where('checklist_id', $data->id)->whereNull('deleted_at')->first();
+                if (isset($kizin_tasks_data) && !empty($kizin_tasks_data)) {
+                    $data->setAttribute('checked', true);
+                }else{
+                    $data->setAttribute('checked', false);
+                }
+                return $data;
+            });
             if (empty($data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
