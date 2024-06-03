@@ -5,6 +5,8 @@ namespace App\Models\Procedure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Procedure\ShoppingTypes;
 
 class KizinTimeline extends Model
 {
@@ -24,4 +26,9 @@ class KizinTimeline extends Model
         'deleted_by',
         'deleted_at',
     ];
+
+    public function stages(): HasOne
+    {
+        return $this->hasOne(ShoppingTypes::class, 'id', 'stage_id');
+    }
 }

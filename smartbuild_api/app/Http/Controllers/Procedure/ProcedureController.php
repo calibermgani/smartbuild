@@ -1946,7 +1946,25 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-            $kizin_timelines = KizinTimeline::get();
+            $kizin_timelines = KizinTimeline::with(['stages'])->get();
+
+            $added_by = $kizin_timelines->map(function ($kizin_timeline) {
+                if ($kizin_timeline->added_by == 1) {
+                    $kizin_timeline->setAttribute('added_by', 'Admin');
+                }else{
+                    $kizin_timeline->setAttribute('added_by', '--');
+                }
+                return $kizin_timeline;
+            });
+
+            $created_by = $kizin_timelines->map(function ($kizin_timeline) {
+                if ($kizin_timeline->created_by == 1) {
+                    $kizin_timeline->setAttribute('created_by', 'Admin');
+                }else{
+                    $kizin_timeline->setAttribute('created_by', '--');
+                }
+                return $kizin_timeline;
+            });
             
             return response()->json(['status' => 'Success', 'message' => 'Kizin Timelines data retrieved successfully', 'code' => 200, 'data' => $kizin_timelines], 200);
         } catch (\Exception $e) {
