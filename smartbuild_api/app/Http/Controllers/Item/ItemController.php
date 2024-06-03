@@ -1224,53 +1224,63 @@ class ItemController extends Controller
         }
     }
 
-    public function procedureItemDashboard(Request $request){
+    public function procedureItemDashboard(Request $request) {
         try {
             $token = $request->token;
             if (!$this->user_authentication($token)) {
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
-
-            $data['item_recall'] = Item::where('tag', 'like', '%Recall%')->get()->count();
-            $data['item_refill_to_cabinet'] = Item::with(['item_category' ,'item_sub_category','item_vendor', 'item_procedures'])
+    
+            $item_recall_count = Item::where('tag', 'like', '%Recall%')->get()->count();
+            $item_refill_to_cabinet_count = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
                 ->whereRaw('COALESCE(cabinet_qty, 0) <= 50')
                 ->get()->count();
-            $data['item_low_stock'] = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
-            ->whereRaw('COALESCE(store_qty, 0) <= 50')
-            ->get()->count();
-
+            $item_low_stock_count = Item::with(['item_category', 'item_sub_category', 'item_vendor', 'item_procedures'])
+                ->whereRaw('COALESCE(store_qty, 0) <= 50')
+                ->get()->count();
+    
             $startDate = Carbon::now()->format('Y-m-d');
             $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
-            $data['near_expired_items'] = Item::whereBetween('expired_date', [$startDate, $endDate])
+            $near_expired_items_count = Item::whereBetween('expired_date', [$startDate, $endDate])
                 ->get()->count();
-            $data['damaged_items'] = ProcedureItemType::select([
-                'mrn_no',
-                'item_id',
-                'accession_no'
-            ])
+            $damaged_items_count = ProcedureItemType::select([
+                    'mrn_no',
+                    'item_id',
+                    'accession_no'
+                ])
                 ->where('type', 'Damaged')
                 ->groupBy('mrn_no', 'item_id', 'accession_no')
                 ->get()->count();
-
-            $data['back_to_cabinet'] = ProcedureItemType::with(['item'])->select([
-                'mrn_no',
-                'item_id',
-                'accession_no',
-                DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
-            ])
+    
+            $back_to_cabinet_count = ProcedureItemType::with(['item'])->select([
+                    'mrn_no',
+                    'item_id',
+                    'accession_no',
+                    DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
+                ])
                 ->where('type', 'Returned')
                 ->groupBy('mrn_no', 'item_id', 'accession_no')
                 ->get()->count();
-
-            $data['daily_consumed'] = ProcedureItemType::select(
-                'mrn_no',
-                'accession_no',
-                DB::raw('GROUP_CONCAT(DISTINCT item_id) as item_id'),
-                DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
+    
+            $daily_consumed_count = ProcedureItemType::select(
+                    'mrn_no',
+                    'accession_no',
+                    DB::raw('GROUP_CONCAT(DISTINCT item_id) as item_id'),
+                    DB::raw('GROUP_CONCAT(DISTINCT procedure_id) as procedure_id')
                 )
                 ->groupBy('mrn_no', 'accession_no')
                 ->get()->count();
-
+    
+            $data = [
+                ["type" => "Daily consumed", "quantity" => $daily_consumed_count],
+                ["type" => "Damaged", "quantity" => $damaged_items_count],
+                ["type" => "Back to Cabinet", "quantity" => $back_to_cabinet_count],
+                ["type" => "Near expired", "quantity" => $near_expired_items_count],
+                ["type" => "Low Stock", "quantity" => $item_low_stock_count],
+                ["type" => "Refill to Cabinet", "quantity" => $item_refill_to_cabinet_count],
+                ["type" => "Recall", "quantity" => $item_recall_count],
+            ];
+    
             return response()->json(['status' => 'Success', 'message' => 'Dashboard counts', 'code' => 200, 'data' => $data]);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
