@@ -1221,7 +1221,7 @@ class ProcedureController extends Controller
             $records = [];
     
             // Fetching records in chunks of 1000
-            DB::table('patients_information')->orderBy('id')->chunk(1000, function ($chunk) use (&$records) {
+            DB::table('patients_information')->orderBy('id')->chunk(10000, function ($chunk) use (&$records) {
                 foreach ($chunk as $record) {
                     $records[] = $record;
                 }
