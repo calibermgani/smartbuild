@@ -1210,15 +1210,15 @@ class ProcedureController extends Controller
                 return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
             }
 
-          /*   $patient_data = PatientsInformation::select([
+            $patient_data = PatientsInformation::select([
                 //'id','title','marital_status','first_name','middle_name','surname','location','age','dob,name_of_partner','name_of_children','referred_by','occupation','gender','telephone','primary_email','address_type','flat_unit_no','street_no','street_name','suburb','town_city','state','post_code','mrn_no','provider_no','patient_type','admission_type','exam_status','study_id','priority','procedure_status','study_date_time','accession_no','requesting_physician','specialty','language','blood_group','weight','height','blood_pressure','heart_beat','spo2','respiratory_rate','temperature','critical_information','notes','image','procedure',
                 "*",
                 DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'","CONCAT_WS('', town_city, state) AS location"),
-            ])->get(); */
+            ])->get();
 
            
                
-            $records = [];
+         /*    $records = [];
     
             // Fetching records in chunks of 1000
             DB::table('patients_information')->orderBy('id')->chunk(10000, function ($chunk) use (&$records) {
@@ -1226,7 +1226,7 @@ class ProcedureController extends Controller
                     $records[] = $record;
                 }
             });
-            $patient_data = $records;
+            $patient_data = $records; */
 
 
             /* $image = $patient_data->map(function ($data) {
