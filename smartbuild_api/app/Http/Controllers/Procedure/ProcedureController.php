@@ -1215,38 +1215,7 @@ class ProcedureController extends Controller
                 DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'","CONCAT_WS('', town_city, state) AS location"),
             ])->get();
 
-           /*  $date_of_birth = $patient_data->map(function ($data) {
-                if (isset($data->dob) && $data->dob != null) {
-                    $age = Carbon::parse($data->don)->age;
-
-                    $data->setAttribute('age', $age);
-                }
-            }); */
-
-           /*  $location = $patient_data->map(function ($data) {
-                if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
-                    $state = $data->town_city . ' - ' . $data->state;
-                    $data->setAttribute('location', $state);
-                }else{
-                    $data->setAttribute('location', null);
-                }
-            }); */
-
-           /*  $soure = $patient_data->map(function ($data) {
-                if($data->patient_source_from == null){
-                    $data->setAttribute('patient_source_from', 'HL7');
-                }
-            }); */
-
-            /* $gender = $patient_data->map(function ($data) {
-                if($data->gender == "M-"){
-                    $data->setAttribute('Gender', 'Male');
-                }elseif(trim($data->gender) == "F"){
-                    $data->setAttribute('Gender', 'Female');
-                }elseif($data->gender == "M"){
-                    $data->setAttribute('Gender', 'Male');
-                }
-            }); */
+          
             $image = $patient_data->map(function ($data) {
                 if ($data->image) {
                     $imageUrl = Storage::url('item_images/' . $data->id . '/' . $data->image);
