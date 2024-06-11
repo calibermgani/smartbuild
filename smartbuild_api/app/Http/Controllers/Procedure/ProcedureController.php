@@ -1232,13 +1232,13 @@ class ProcedureController extends Controller
                 }
             }); */
 
-            $soure = $patient_data->map(function ($data) {
+           /*  $soure = $patient_data->map(function ($data) {
                 if($data->patient_source_from == null){
                     $data->setAttribute('patient_source_from', 'HL7');
                 }
-            });
+            }); */
 
-            $gender = $patient_data->map(function ($data) {
+            /* $gender = $patient_data->map(function ($data) {
                 if($data->gender == "M-"){
                     $data->setAttribute('Gender', 'Male');
                 }elseif(trim($data->gender) == "F"){
@@ -1246,7 +1246,7 @@ class ProcedureController extends Controller
                 }elseif($data->gender == "M"){
                     $data->setAttribute('Gender', 'Male');
                 }
-            });
+            }); */
             $image = $patient_data->map(function ($data) {
                 if ($data->image) {
                     $imageUrl = Storage::url('item_images/' . $data->id . '/' . $data->image);
