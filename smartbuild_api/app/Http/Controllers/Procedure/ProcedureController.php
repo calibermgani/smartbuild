@@ -1212,7 +1212,7 @@ class ProcedureController extends Controller
 
             $patient_data = PatientsInformation::select([
                 "*",
-                DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'"),
+                DB::raw("CONCAT(first_name, ' ', middle_name, ' ', surname) as 'Name'","CONCAT_WS('', town_city, state) AS location"),
             ])->get();
 
             $date_of_birth = $patient_data->map(function ($data) {
@@ -1223,14 +1223,14 @@ class ProcedureController extends Controller
                 }
             });
 
-            $location = $patient_data->map(function ($data) {
+           /*  $location = $patient_data->map(function ($data) {
                 if (isset($data->town_city) && $data->town_city != null && isset($data->state) && $data->state != null) {
                     $state = $data->town_city . ' - ' . $data->state;
                     $data->setAttribute('location', $state);
                 }else{
                     $data->setAttribute('location', null);
                 }
-            });
+            }); */
 
             $soure = $patient_data->map(function ($data) {
                 if($data->patient_source_from == null){
