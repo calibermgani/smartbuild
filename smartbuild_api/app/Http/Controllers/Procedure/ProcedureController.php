@@ -1216,14 +1216,14 @@ class ProcedureController extends Controller
             ])->get();
 
           
-            $image = $patient_data->map(function ($data) {
+            /* $image = $patient_data->map(function ($data) {
                 if ($data->image) {
                     $imageUrl = Storage::url('item_images/' . $data->id . '/' . $data->image);
                 } else {
                     $imageUrl = null;
                 }
                 $data->setAttribute('image', $imageUrl);
-            });
+            }); */
 
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
