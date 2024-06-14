@@ -1065,12 +1065,26 @@ class ProcedureController extends Controller
                                 }
                             }
                         }
+
+                        $patient_vitals = new PatientVitals();
+                        $patient_vitals->patient_id = $patient_details->id;
+                        $patient_vitals->mrn_number = $data['mrn_no'];
+                        $patient_vitals->procedure = $data['procedure'];
+                        $patient_vitals->accession_no = null;
+                        $patient_vitals->added_by = 1;
+                        $patient_vitals->created_by = 1;
+                        $patient_vitals->blood_pressure = $data['blood_pressure'];
+                        $patient_vitals->heart_beat = $data['heart_beat'];
+                        $patient_vitals->spO2 = $data['spo2'];
+                        $patient_vitals->respiratory_rate = $data['respiratory_rate'];
+                        $patient_vitals->temperature = $data['temperature'];
+                        $patient_vitals->save();
                     }
                 }
                 return response()->json(['status' => 'Success', 'message' => 'Patient details added successfully', 'code'=>200, 'data' => $patient_details], 200);
             } catch (\Exception $e) {
                 log::debug($e->getMessage());
-                return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+                return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
             }
         }
     }
@@ -1865,6 +1879,29 @@ class ProcedureController extends Controller
                         }
                     }
                     $patient_data->update($data);
+
+                    if (count($request->documents) > 0) {
+                        foreach ($request->documents as $key => $document) {
+                            $documentFilenameWithExt = $document->getClientOriginalName();
+                            $document_filename = pathinfo($documentFilenameWithExt, PATHINFO_FILENAME);
+                            $document_extension = $document->getClientOriginalExtension();
+                            $documentToStore = $document_filename . '_' . time() . '.' . $document_extension;
+                            if (!Storage::exists('public/patient_document/' . $patient_details->id)) {
+                                $storage_path = Storage::makeDirectory('public/patient_document/' . $patient_details->id, 0775, true);
+                                $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                            } else {
+                                $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                            }
+                            $document_name = $documentToStore;
+                            if (isset($document_name) && !empty($document_name)) {
+                                $document_data = new PatientDocument();
+                                $document_data->patient_id = $patient_details->id;
+                                $document_data->document_name = $document_name;
+                                $document_data->created_by = 1;
+                                $document_data->save();
+                            }
+                        }
+                    }
                     return response()->json(['status' => 'Success', 'message' => 'Patient details updated successfully', 'code'=>200, 'data' => $patient_data], 200);
                 }
             }
@@ -2014,6 +2051,28 @@ class ProcedureController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error storing patient vitals: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientVitalsEdit(Request $request)
+    {
+        try {
+
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+            if (isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $patient_vitals = PatientVitals::where('patient_id', $data['patient_id'])->latest()->first();
+                return response()->json(['status' => 'success', 'message' => 'Patient Vitals data retrieved successfully', 'code' => 200, 'data' => $patient_vitals], 200);
+            }
+
+        } catch (\Exception $e) {
             Log::error('Error storing patient vitals: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }

@@ -190,6 +190,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/kizin_tasks', [ProcedureController::class, 'kizinTasks']);
     Route::any('/kizin_timelines', [ProcedureController::class, 'kizinTimelines']);
     Route::any('/patient_vitals_store', [ProcedureController::class, 'patientVitalsStore']);
+    Route::any('/patient_vitals_edit', [ProcedureController::class, 'patientVitalsEdit']);
 });
 
 
