@@ -1787,6 +1787,16 @@ class ProcedureController extends Controller
             if($patient_data->patient_source_from == null){
                 $patient_data->setAttribute('patient_source_from', 'HL7');
             }
+
+            $patient_document_datas = PatientDocument::where('patient_id', $request->patient_id)->get();
+
+            if (count($patient_document_datas) > 0) {
+                $document = [];
+                foreach ($patient_document_datas as $key => $patient_document_data) {
+                    $document[] = Storage::url('patient_image/' . $patient_data->id . '/' . $patient_document_data->document_name);
+                }
+                $patient_data->setAttribute('document', $document);
+            }
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
             } else {
