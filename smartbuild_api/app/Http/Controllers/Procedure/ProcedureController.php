@@ -1810,7 +1810,7 @@ class ProcedureController extends Controller
                 $document_name = [];
                 foreach ($patient_document_datas as $key => $patient_document_data) {
                     $document[] = Storage::url('patient_document/' . $patient_data->id . '/' . $patient_document_data->document_name);
-                    $document_name[] = $patient_document_data->document_name;
+                    $document_name[] = ['name' => $patient_document_data->document_name];
                 }
                 $patient_data->setAttribute('document', $document);
                 $patient_data->setAttribute('document_name', $document_name);
