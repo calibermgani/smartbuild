@@ -1793,7 +1793,7 @@ class ProcedureController extends Controller
             if (count($patient_document_datas) > 0) {
                 $document = [];
                 foreach ($patient_document_datas as $key => $patient_document_data) {
-                    $document[] = Storage::url('patient_image/' . $patient_data->id . '/' . $patient_document_data->document_name);
+                    $document[] = Storage::url('patient_document/' . $patient_data->id . '/' . $patient_document_data->document_name);
                 }
                 $patient_data->setAttribute('document', $document);
             }
