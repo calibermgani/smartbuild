@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Procedure\PatientVitals;
 
 class ProcedureController extends Controller
 {
@@ -1969,6 +1970,35 @@ class ProcedureController extends Controller
             return response()->json(['status' => 'Success', 'message' => 'Kizin Timelines data retrieved successfully', 'code' => 200, 'data' => $kizin_timelines], 200);
         } catch (\Exception $e) {
             log::debug($e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientVitalsStore(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+
+            if (isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $patient_vitals = PatientVitals::create($data);
+                DB::commit();
+                return response()->json(['status' => 'success', 'message' => 'Patient Vitals data saved successfully', 'code' => 200, 'data' => $patient_vitals], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Patient details not found'], 400);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error storing patient vitals: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
         }
     }
