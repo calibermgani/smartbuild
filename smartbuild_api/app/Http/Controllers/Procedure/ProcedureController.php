@@ -36,6 +36,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Procedure\PatientVitals;
 use App\Models\Procedure\PatientDocument;
 use App\Models\Procedure\PatientPrecaution;
+use App\Models\Procedure\PatientPrecautionMoreData;
 
 class ProcedureController extends Controller
 {
@@ -2097,8 +2098,33 @@ class ProcedureController extends Controller
 
             if (isset($data['patient_id']) && !empty($data['patient_id'])) {
                 $patient_precautions = PatientPrecaution::create($data);
+                if (isset($patient_precautions->id) && !empty($patient_precautions->id)) {
+                    $patient_precautions_data = new PatientPrecautionMoreData;
+                    $patient_precautions_data->patient_precaution_id = $patient_precautions->id;
+                    if (count($data['gcs_eye_opening']) > 0) {
+                        $patient_precautions_data->gcs_eye_opening = implode(',', $data['gcs_eye_opening']);
+                    }else{
+                        $patient_precautions_data->gcs_eye_opening = null;
+                    }
+                    if (count($data['gcs_verbal_response']) > 0) {
+                        $patient_precautions_data->gcs_verbal_response = implode(',', $data['gcs_verbal_response']);
+                    }else{
+                        $patient_precautions_data->gcs_verbal_response = null;
+                    }
+                    if (count($data['gcs_motor_response']) > 0) {
+                        $patient_precautions_data->gcs_motor_response = implode(',', $data['gcs_motor_response']);
+                    }else{
+                        $patient_precautions_data->gcs_motor_response = null;
+                    }
+                    if (count($data['contrast_reaction_values']) > 0) {
+                        $patient_precautions_data->contrast_reaction_values = implode(',', $data['contrast_reaction_values']);
+                    }else{
+                        $patient_precautions_data->contrast_reaction_values = null;
+                    }
+                    $patient_precautions_data->save();
+                }
                 DB::commit();
-                return response()->json(['status' => 'success', 'message' => 'Patient Precautions data saved successfully', 'code' => 200, 'data' => $patient_precautions], 200);
+                return response()->json(['status' => 'success', 'message' => 'Patient Precautions data saved successfully', 'code' => 200, 'data' => $patient_precautions, 'precautions_data' => $patient_precautions_data], 200);
             } else {
                 DB::rollBack();
                 return response()->json(['status' => 'error', 'code' => 400, 'message' => 'Patient details not found'], 400);
@@ -2108,6 +2134,44 @@ class ProcedureController extends Controller
             DB::rollBack();
             Log::error('Error storing patient vitals: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'code' => 500, 'message' => 'Please contact the administrator'], 500);
+        }
+    }
+
+    public function patientPrecautionsEdit(Request $request)
+    {
+        try {
+
+            $token = $request->token;
+
+            if (!$this->user_authentication($token)) {
+                return response()->json(['status' => 'error', 'code' => 401, 'message' => 'Unauthorized'], 401);
+            }
+
+            $data = $request->all();
+            if (isset($data['patient_id']) && !empty($data['patient_id'])) {
+                $patient_precautions = PatientPrecaution::with('precautions_more_data')->where('patient_id', $data['patient_id'])->latest()->first();
+                if (isset($patient_precautions->precautions_more_data->gcs_eye_opening) && !empty($patient_precautions->precautions_more_data->gcs_eye_opening)) {
+                    $gcs_eye_opening = explode(',', $patient_precautions->precautions_more_data->gcs_eye_opening);
+                    $patient_precautions->setAttribute('gcs_eye_opening', $gcs_eye_opening);
+                }
+                if (isset($patient_precautions->precautions_more_data->gcs_verbal_response) && !empty($patient_precautions->precautions_more_data->gcs_verbal_response)) {
+                    $gcs_verbal_response = explode(',', $patient_precautions->precautions_more_data->gcs_verbal_response);
+                    $patient_precautions->setAttribute('gcs_verbal_response', $gcs_verbal_response);
+                }
+                if (isset($patient_precautions->precautions_more_data->gcs_motor_response) && !empty($patient_precautions->precautions_more_data->gcs_motor_response)) {
+                    $gcs_motor_response = explode(',', $patient_precautions->precautions_more_data->gcs_motor_response);
+                    $patient_precautions->setAttribute('gcs_motor_response', $gcs_motor_response);
+                }
+                if (isset($patient_precautions->precautions_more_data->contrast_reaction_values) && !empty($patient_precautions->precautions_more_data->contrast_reaction_values)) {
+                    $contrast_reaction_values = explode(',', $patient_precautions->precautions_more_data->contrast_reaction_values);
+                    $patient_precautions->setAttribute('contrast_reaction_values', $contrast_reaction_values);
+                }
+                return response()->json(['status' => 'success', 'message' => 'Patient Precautions data retrieved successfully', 'code' => 200, 'data' => $patient_precautions], 200);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error storing patient vitals: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'code' => 500, 'message' => $e->getMessage()], 500);
         }
     }
 }

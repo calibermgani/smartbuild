@@ -192,6 +192,7 @@ Route::prefix('procedures')->group(function () {
     Route::any('/patient_vitals_store', [ProcedureController::class, 'patientVitalsStore']);
     Route::any('/patient_vitals_edit', [ProcedureController::class, 'patientVitalsEdit']);
     Route::any('/patient_precautions_store', [ProcedureController::class, 'patientPrecautionsStore']);
+    Route::any('/patient_precautions_edit', [ProcedureController::class, 'patientPrecautionsEdit']);
 });
 
 

@@ -5,6 +5,7 @@ namespace App\Models\Procedure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PatientPrecaution extends Model
 {
@@ -29,4 +30,9 @@ class PatientPrecaution extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function precautions_more_data(): HasOne
+    {
+        return $this->hasOne(PatientPrecautionMoreData::class, 'patient_precaution_id', 'id');
+    }
 }
