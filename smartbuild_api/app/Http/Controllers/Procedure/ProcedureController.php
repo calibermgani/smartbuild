@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Procedure\PatientVitals;
+use App\Models\Procedure\PatientDocument;
 
 class ProcedureController extends Controller
 {
@@ -1040,6 +1041,29 @@ class ProcedureController extends Controller
                         }else{
                             $data['image'] = null;
                             $patient_details->update($data);
+                        }
+
+                        if (count($request->documents) > 0) {
+                            foreach ($request->documents as $key => $document) {
+                                $documentFilenameWithExt = $document->getClientOriginalName();
+                                $document_filename = pathinfo($documentFilenameWithExt, PATHINFO_FILENAME);
+                                $document_extension = $document->getClientOriginalExtension();
+                                $documentToStore = $document_filename . '_' . time() . '.' . $document_extension;
+                                if (!Storage::exists('public/patient_document/' . $patient_details->id)) {
+                                    $storage_path = Storage::makeDirectory('public/patient_document/' . $patient_details->id, 0775, true);
+                                    $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                                } else {
+                                    $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                                }
+                                $document_name = $documentToStore;
+                                if (isset($document_name) && !empty($document_name)) {
+                                    $document_data = new PatientDocument();
+                                    $document_data->patient_id = $patient_details->id;
+                                    $document_data->document_name = $document_name;
+                                    $document_data->created_by = 1;
+                                    $document_data->save();
+                                }
+                            }
                         }
                     }
                 }
