@@ -1806,10 +1806,13 @@ class ProcedureController extends Controller
 
             if (count($patient_document_datas) > 0) {
                 $document = [];
+                $document_name = [];
                 foreach ($patient_document_datas as $key => $patient_document_data) {
                     $document[] = Storage::url('patient_document/' . $patient_data->id . '/' . $patient_document_data->document_name);
+                    $document_name[] = $patient_document_data->document_name;
                 }
                 $patient_data->setAttribute('document', $document);
+                $patient_data->setAttribute('document_name', $document_name);
             }
             if (empty($patient_data)) {
                 return response()->json(['status' => 'error', 'code' => 204, 'message' => 'No item found'], 204);
@@ -1880,28 +1883,28 @@ class ProcedureController extends Controller
                     }
                     $patient_data->update($data);
 
-                    if (count($request->documents) > 0) {
-                        foreach ($request->documents as $key => $document) {
-                            $documentFilenameWithExt = $document->getClientOriginalName();
-                            $document_filename = pathinfo($documentFilenameWithExt, PATHINFO_FILENAME);
-                            $document_extension = $document->getClientOriginalExtension();
-                            $documentToStore = $document_filename . '_' . time() . '.' . $document_extension;
-                            if (!Storage::exists('public/patient_document/' . $patient_details->id)) {
-                                $storage_path = Storage::makeDirectory('public/patient_document/' . $patient_details->id, 0775, true);
-                                $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
-                            } else {
-                                $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
-                            }
-                            $document_name = $documentToStore;
-                            if (isset($document_name) && !empty($document_name)) {
-                                $document_data = new PatientDocument();
-                                $document_data->patient_id = $patient_details->id;
-                                $document_data->document_name = $document_name;
-                                $document_data->created_by = 1;
-                                $document_data->save();
-                            }
-                        }
-                    }
+                    // if (count($request->documents) > 0) {
+                    //     foreach ($request->documents as $key => $document) {
+                    //         $documentFilenameWithExt = $document->getClientOriginalName();
+                    //         $document_filename = pathinfo($documentFilenameWithExt, PATHINFO_FILENAME);
+                    //         $document_extension = $document->getClientOriginalExtension();
+                    //         $documentToStore = $document_filename . '_' . time() . '.' . $document_extension;
+                    //         if (!Storage::exists('public/patient_document/' . $patient_details->id)) {
+                    //             $storage_path = Storage::makeDirectory('public/patient_document/' . $patient_details->id, 0775, true);
+                    //             $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                    //         } else {
+                    //             $path = $document->storeAs('public/patient_document/' . $patient_details->id, $documentToStore);
+                    //         }
+                    //         $document_name = $documentToStore;
+                    //         if (isset($document_name) && !empty($document_name)) {
+                    //             $document_data = new PatientDocument();
+                    //             $document_data->patient_id = $patient_details->id;
+                    //             $document_data->document_name = $document_name;
+                    //             $document_data->created_by = 1;
+                    //             $document_data->save();
+                    //         }
+                    //     }
+                    // }
                     return response()->json(['status' => 'Success', 'message' => 'Patient details updated successfully', 'code'=>200, 'data' => $patient_data], 200);
                 }
             }
