@@ -1107,7 +1107,7 @@ class ProcedureController extends Controller
                     $stage_type = [];
                 }
                 $ch_pre_diagnosis = PatientChPreDiagnosis::where('stage_id', $stage_type->id)
-                    ->where('patient_id', $request->patient_id)
+                    // ->where('patient_id', $request->patient_id)
                     ->where('mrn_number', $request->mrn_number)
                     ->orderBy('id', 'desc')
                     ->get();
@@ -1187,7 +1187,7 @@ class ProcedureController extends Controller
                                 'token' => $data['token'],
                                 'stage_id' => $stage_type->id,
                                 'mrn_number' => $data['mrn_number'],
-                                'patient_id' => $data['patient_id'],
+                                'patient_id' => null,
                                 'diagnosis' => $diagnosis['diagnosis'],
                                 'code' => $diagnosis['code'],
                                 'date' => Carbon::parse($diagnosis['date'])->format('Y-m-d H:i:s'),
@@ -1221,10 +1221,10 @@ class ProcedureController extends Controller
 
             $data = $request->all();
 
-            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number'])) {
                 $ch_pre_diagnosis = PatientChPreDiagnosis::where('id', $data['id'])
                     ->where('mrn_number', $data['mrn_number'])
-                    ->where('patient_id', $data['patient_id'])
+                    // ->where('patient_id', $data['patient_id'])
                     ->first();
                 if (isset($ch_pre_diagnosis) && !empty($ch_pre_diagnosis)) {
                     $ch_pre_diagnosis->deleted_by = $data['deleted_by'];
@@ -1306,7 +1306,7 @@ class ProcedureController extends Controller
                     $stage_type = [];
                 }
                 $ch_indication = PatientChIndication::where('stage_id', $stage_type->id)
-                    ->where('patient_id', $request->patient_id)
+                    // ->where('patient_id', $request->patient_id)
                     ->where('mrn_number', $request->mrn_number)
                     ->orderBy('id', 'desc')
                     ->get();
@@ -1335,7 +1335,7 @@ class ProcedureController extends Controller
                     $stage_type = [];
                 }
                 $ch_post_diagnosis = PatientChPostDiagnosis::where('stage_id', $stage_type->id)
-                    ->where('patient_id', $request->patient_id)
+                    // ->where('patient_id', $request->patient_id)
                     ->where('mrn_number', $request->mrn_number)
                     ->orderBy('id', 'desc')
                     ->get();
@@ -1428,7 +1428,7 @@ class ProcedureController extends Controller
                                 'token' => $data['token'],
                                 'stage_id' => $stage_type->id,
                                 'mrn_number' => $data['mrn_number'],
-                                'patient_id' => $data['patient_id'],
+                                'patient_id' => null,
                                 'diagnosis' => $indication['diagnosis'],
                                 'code' => $indication['code'],
                                 'date' => Carbon::parse($indication['date'])->format('Y-m-d H:i:s'),
@@ -1474,7 +1474,7 @@ class ProcedureController extends Controller
                                 'token' => $data['token'],
                                 'stage_id' => $stage_type->id,
                                 'mrn_number' => $data['mrn_number'],
-                                'patient_id' => $data['patient_id'],
+                                'patient_id' => null,
                                 'diagnosis' => $post_diagnosis['diagnosis'],
                                 'code' => $post_diagnosis['code'],
                                 'date' => Carbon::parse($post_diagnosis['date'])->format('Y-m-d H:i:s'),
@@ -1508,10 +1508,10 @@ class ProcedureController extends Controller
 
             $data = $request->all();
 
-            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number'])) {
                 $ch_indication = PatientChIndication::where('id', $data['id'])
                     ->where('mrn_number', $data['mrn_number'])
-                    ->where('patient_id', $data['patient_id'])
+                    // ->where('patient_id', $data['patient_id'])
                     ->first();
                 if (isset($ch_indication) && !empty($ch_indication)) {
                     $ch_indication->deleted_by = $data['deleted_by'];
@@ -1540,10 +1540,10 @@ class ProcedureController extends Controller
 
             $data = $request->all();
 
-            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number']) && isset($data['patient_id']) && !empty($data['patient_id'])) {
+            if (isset($data['id']) && !empty($data['id']) && isset($data['mrn_number']) && !empty($data['mrn_number'])) {
                 $ch_post_diagnosis = PatientChPostDiagnosis::where('id', $data['id'])
                     ->where('mrn_number', $data['mrn_number'])
-                    ->where('patient_id', $data['patient_id'])
+                    // ->where('patient_id', $data['patient_id'])
                     ->first();
                 if (isset($ch_post_diagnosis) && !empty($ch_post_diagnosis)) {
                     $ch_post_diagnosis->deleted_by = $data['deleted_by'];
